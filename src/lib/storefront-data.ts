@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { products as fallbackProducts } from "@/data/catalog";
 
 export type StoreProduct = {
   id: string;
@@ -22,6 +23,12 @@ const fallbackByCategory = {
   Necklaces: "/products/ruby-oval-pendant-necklace.png",
   Rings: "/products/zircon-anniversary-ring.png",
 };
+
+const fallbackStoreProducts: StoreProduct[] = fallbackProducts.map((product, index) => ({
+  ...product,
+  dbId: index + 1,
+  images: [product.image],
+}));
 
 function stripHtml(value: string) {
   return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -61,42 +68,57 @@ export function formatStoreProduct(product: any): StoreProduct {
 }
 
 export async function getStoreProducts() {
-  const products = await prisma.product.findMany({
-    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-    include: {
-      images: { orderBy: { sortOrder: "asc" } },
-      categories: true,
-      skus: { include: { images: { orderBy: { sortOrder: "asc" } } } },
-    },
-  });
-  return products.map(formatStoreProduct);
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        categories: true,
+        skus: { include: { images: { orderBy: { sortOrder: "asc" } } } },
+      },
+    });
+    return products.map(formatStoreProduct);
+  } catch (error) {
+    console.error("Failed to load store products from database", error);
+    return fallbackStoreProducts;
+  }
 }
 
 export async function getFeaturedStoreProducts() {
-  const products = await prisma.product.findMany({
-    where: { featured: true },
-    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-    take: 8,
-    include: {
-      images: { orderBy: { sortOrder: "asc" } },
-      categories: true,
-      skus: { include: { images: { orderBy: { sortOrder: "asc" } } } },
-    },
-  });
-  if (products.length) return products.map(formatStoreProduct);
-  return (await getStoreProducts()).slice(0, 8);
+  try {
+    const products = await prisma.product.findMany({
+      where: { featured: true },
+      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+      take: 8,
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        categories: true,
+        skus: { include: { images: { orderBy: { sortOrder: "asc" } } } },
+      },
+    });
+    if (products.length) return products.map(formatStoreProduct);
+    return (await getStoreProducts()).slice(0, 8);
+  } catch (error) {
+    console.error("Failed to load featured store products from database", error);
+    return fallbackStoreProducts.slice(0, 8);
+  }
 }
 
 export async function getStoreProductBySlug(slug: string) {
-  const product = await prisma.product.findUnique({
-    where: { slug },
-    include: {
-      images: { orderBy: { sortOrder: "asc" } },
-      categories: true,
-      skus: { include: { images: { orderBy: { sortOrder: "asc" } } } },
-    },
-  });
-  return product ? formatStoreProduct(product) : null;
+  try {
+    const product = await prisma.product.findUnique({
+      where: { slug },
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        categories: true,
+        skus: { include: { images: { orderBy: { sortOrder: "asc" } } } },
+      },
+    });
+    return product ? formatStoreProduct(product) : null;
+  } catch (error) {
+    console.error("Failed to load store product from database", error);
+    return fallbackStoreProducts.find((product) => product.id === slug) || null;
+  }
 }
 
 export function getRelatedStoreProducts(product: StoreProduct, products: StoreProduct[]) {
