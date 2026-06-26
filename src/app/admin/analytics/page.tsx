@@ -2,7 +2,7 @@ import {
   getOverview, getLandingStats, getTopPages, getSourceBreakdown,
   getDeviceBreakdown, getDailyTrend, getRecentVisits, type Range,
 } from '@/lib/analytics-query';
-import { Eye, Users, Megaphone, Smartphone } from 'lucide-react';
+import { Eye, Users, Megaphone, Smartphone, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -231,7 +231,7 @@ export default async function AdminAnalyticsPage({
 function StatCard({
   label, value, subtitle, icon: Icon, color, href,
 }: {
-  label: string; value: number; subtitle?: string; icon: any; color: string; href?: string;
+  label: string; value: number; subtitle?: string; icon: LucideIcon; color: string; href?: string;
 }) {
   const inner = (
     <div className={`bg-white rounded-2xl p-5 border border-slate-200 ${href ? 'hover:border-brand-primary hover:shadow-md transition' : ''}`}>

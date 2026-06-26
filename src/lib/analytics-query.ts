@@ -1,6 +1,20 @@
 import { prisma } from './prisma';
 
 export type Range = 1 | 7 | 30 | 90;
+export type CountByPath = { path: string; count: number };
+export type CountBySource = { source: string; count: number };
+export type CountByDevice = { device: string; count: number };
+export type DailyTrendPoint = { date: string; pv: number; uv: number };
+export type RecentVisit = {
+  id: number;
+  path: string;
+  source: string;
+  referrer: string;
+  device: string;
+  utmSource: string;
+  utmCampaign: string;
+  createdAt: Date;
+};
 
 function startDate(days: Range): Date {
   const d = new Date();
@@ -27,7 +41,7 @@ export async function getOverview(days: Range) {
   return { pv, uv: uvRows.length };
 }
 
-export async function getLandingStats(path: string, days: Range) {
+export async function getLandingStats(path: string, days: Range): Promise<{ pv: number; uv: number; sources: CountBySource[] }> {
   const where = { ...baseFilter(days), path };
   const [pv, uvRows, sources] = await Promise.all([
     prisma.pageView.count({ where }),
@@ -47,7 +61,7 @@ export async function getLandingStats(path: string, days: Range) {
   };
 }
 
-export async function getTopPages(days: Range, limit = 10) {
+export async function getTopPages(days: Range, limit = 10): Promise<CountByPath[]> {
   const rows = await prisma.pageView.groupBy({
     by: ['path'],
     where: baseFilter(days),
@@ -58,7 +72,7 @@ export async function getTopPages(days: Range, limit = 10) {
   return rows.map((r) => ({ path: r.path, count: r._count._all }));
 }
 
-export async function getSourceBreakdown(days: Range) {
+export async function getSourceBreakdown(days: Range): Promise<CountBySource[]> {
   const rows = await prisma.pageView.groupBy({
     by: ['source'],
     where: baseFilter(days),
@@ -68,7 +82,7 @@ export async function getSourceBreakdown(days: Range) {
   return rows.map((r) => ({ source: r.source, count: r._count._all }));
 }
 
-export async function getDeviceBreakdown(days: Range) {
+export async function getDeviceBreakdown(days: Range): Promise<CountByDevice[]> {
   const rows = await prisma.pageView.groupBy({
     by: ['device'],
     where: baseFilter(days),
@@ -78,7 +92,7 @@ export async function getDeviceBreakdown(days: Range) {
   return rows.map((r) => ({ device: r.device || 'unknown', count: r._count._all }));
 }
 
-export async function getDailyTrend(days: Range) {
+export async function getDailyTrend(days: Range): Promise<DailyTrendPoint[]> {
   const rows = await prisma.pageView.findMany({
     where: baseFilter(days),
     select: { createdAt: true, visitorId: true },
@@ -100,7 +114,7 @@ export async function getDailyTrend(days: Range) {
   return Array.from(buckets.entries()).map(([date, v]) => ({ date, pv: v.pv, uv: v.uv.size }));
 }
 
-export async function getRecentVisits(limit = 25) {
+export async function getRecentVisits(limit = 25): Promise<RecentVisit[]> {
   const rows = await prisma.pageView.findMany({
     where: { isBot: false },
     orderBy: { createdAt: 'desc' },
