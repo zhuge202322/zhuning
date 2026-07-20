@@ -1,53 +1,162 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Factory, FileCheck2, Gem, MessagesSquare } from "lucide-react";
+import { ArrowRight, Factory, Gem, Mail, MapPin, PackageCheck, Users } from "lucide-react";
 import { PageMotion } from "@/components/PageMotion";
+import { companyProfile, companyStats, companyTimeline } from "@/data/company";
 
 export const metadata: Metadata = {
-  title: "About Muxcor | Company & Workshop",
-  description: "Learn about Muxcor's Guangzhou jewelry workshop, showroom, product review, and sourcing process.",
+  title: "About Muxcor | Jewelry Manufacturer in Guangzhou",
+  description:
+    "Meet Guangzhou Muxcor International Co., Ltd., explore the workshop and showroom, and learn about its jewelry production and customization capabilities.",
 };
+
+const gallery = [
+  { src: "/company/showroom-interior.webp", alt: "Muxcor jewelry showroom interior" },
+  { src: "/company/showroom-display.webp", alt: "Jewelry displayed in the Muxcor showroom" },
+  { src: "/company/production-machines.webp", alt: "Jewelry production equipment behind a glass partition" },
+  { src: "/company/production-floor.webp", alt: "Muxcor production floor" },
+  { src: "/company/product-display.webp", alt: "Jewelry product display area" },
+  { src: "/company/jewelry-studio.webp", alt: "Muxcor jewelry development studio" },
+];
+
+const capabilities = [
+  {
+    icon: Gem,
+    title: "Broad jewelry range",
+    copy: "Earrings, rings, necklaces, sets, bracelets, bangles, anklets, brooches, and related fashion accessories.",
+  },
+  {
+    icon: Factory,
+    title: "Material and finish options",
+    copy: "Stainless steel, alloy, copper, imitation pearl, gold-plated, silver-plated, and other project-specific materials.",
+  },
+  {
+    icon: Users,
+    title: "OEM and ODM support",
+    copy: "Design discussion, CAD and sample development, production coordination, and order follow-up through one team.",
+  },
+  {
+    icon: PackageCheck,
+    title: "Order delivery support",
+    copy: "Packing, documentation, and delivery details are confirmed around the approved sample and quotation.",
+  },
+];
 
 export default function AboutPage() {
   return (
     <>
       <PageMotion />
-      <section className="company-hero page-reveal">
-        <Image src="/media/company-workshop.png" alt="Muxcor jewelry workshop in Guangzhou" fill priority sizes="100vw" />
+      <section className="company-hero company-hero-rich page-reveal">
+        <Image src="/company/jewelry-studio.webp" alt="Muxcor jewelry studio in Guangzhou" fill priority sizes="100vw" />
         <div className="company-hero-scrim" />
         <div>
-          <h1>Guangzhou Muxcor International Co., Ltd.</h1>
-          <p>A real workshop and showroom supporting jewelry product review, customization discussion, and production coordination.</p>
-          <Link className="primary-link" href="/inquiry-cart">Start an inquiry <ArrowRight size={18} /></Link>
+          <p className="section-kicker">Our company</p>
+          <h1>{companyProfile.name}</h1>
+          <p>{companyProfile.overview}</p>
+          <div className="company-actions">
+            <Link className="primary-link" href="/customization">
+              Explore customization <ArrowRight size={18} />
+            </Link>
+            <Link className="secondary-link light" href="/certifications">View certifications</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="company-stat-band page-reveal" aria-label="Company facts">
+        {companyStats.map((stat) => (
+          <div key={stat.label}>
+            <strong>{stat.value}</strong>
+            <span>{stat.label}</span>
+          </div>
+        ))}
+      </section>
+
+      <section className="company-story page-reveal">
+        <div className="company-story-copy">
+          <p className="section-kicker">Built in Guangzhou</p>
+          <h2>From product idea to repeatable supply.</h2>
+          <p>
+            Muxcor has worked in fashion jewelry since 2007, with factory production beginning in 2015.
+            The team combines product development, manufacturing follow-up, catalogue sourcing, and export
+            coordination for buyers serving different markets.
+          </p>
+          <p>
+            Samples can be prepared for evaluation before production. Confirmed specifications, materials,
+            finish, and quality expectations are then used to coordinate the order through packing and delivery.
+          </p>
+          <Link className="secondary-link" href="/products">Browse the current catalogue</Link>
+        </div>
+        <div className="company-story-image">
+          <Image src="/company/production-machines.webp" alt="Muxcor jewelry production area" fill sizes="(max-width: 860px) 100vw, 48vw" />
+        </div>
+      </section>
+
+      <section className="company-timeline page-reveal">
+        <div className="section-heading">
+          <div>
+            <p className="section-kicker">Company history</p>
+            <h2>A long-term production partner, built step by step.</h2>
+          </div>
+        </div>
+        <div className="timeline-list">
+          {companyTimeline.map((item) => (
+            <article key={item.year}>
+              <span>{item.year}</span>
+              <div>
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
       <section className="company-capabilities page-reveal">
         <div className="section-heading">
           <div>
-            <p className="section-kicker">Company scope</p>
-            <h2>What the team handles</h2>
+            <p className="section-kicker">Working scope</p>
+            <h2>Capabilities around the product, not just the item.</h2>
           </div>
         </div>
         <div className="capability-list">
-          <article><Gem size={24} /><h3>Product catalogue</h3><p>Rings, necklaces, and coordinated jewelry sets from the supplied product files.</p></article>
-          <article><MessagesSquare size={24} /><h3>Requirement review</h3><p>SKU selection, target quantities, market requirements, and customization notes.</p></article>
-          <article><Factory size={24} /><h3>Production coordination</h3><p>Sample discussion and production follow-up through the Guangzhou team.</p></article>
-          <article><FileCheck2 size={24} /><h3>Document review</h3><p>Available company and product compliance documents can be reviewed for relevant orders.</p></article>
+          {capabilities.map((item) => {
+            const Icon = item.icon;
+            return (
+              <article key={item.title}>
+                <Icon size={24} />
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </article>
+            );
+          })}
         </div>
       </section>
 
-      <section className="company-gallery page-reveal">
-        <Image src="/media/company-showroom.png" alt="Muxcor jewelry showroom and product display" width={900} height={900} />
-        <div>
-          <p className="section-kicker">Showroom</p>
-          <h2>View products, then send one clear request.</h2>
-          <p>The public catalogue is organized by product category. Add the SKUs you need to the inquiry cart and the request will appear in the back-office order list.</p>
-          <div className="company-actions">
-            <Link className="primary-link" href="/products">Browse jewelry</Link>
-            <Link className="secondary-link" href="/inquiry-cart">Open inquiry cart</Link>
+      <section className="company-photo-section page-reveal">
+        <div className="section-heading">
+          <div>
+            <p className="section-kicker">Inside Muxcor</p>
+            <h2>Showroom, product displays, and working areas.</h2>
           </div>
+        </div>
+        <div className="company-photo-grid">
+          {gallery.map((image, index) => (
+            <figure className={index === 0 || index === 5 ? "wide" : ""} key={image.src}>
+              <Image src={image.src} alt={image.alt} fill sizes="(max-width: 560px) 100vw, (max-width: 1000px) 50vw, 33vw" />
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section className="company-contact page-reveal">
+        <div>
+          <p className="section-kicker">Contact Muxcor</p>
+          <h2>Discuss your market, products, and sourcing plan.</h2>
+        </div>
+        <div className="company-contact-details">
+          <p><MapPin size={20} /> {companyProfile.address}</p>
+          <a href={`mailto:${companyProfile.email}`}><Mail size={20} /> {companyProfile.email}</a>
         </div>
       </section>
     </>

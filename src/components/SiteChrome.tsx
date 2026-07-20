@@ -23,6 +23,8 @@ const navItems = [
   { href: "/collections/womens-bags", label: "Women's Bags" },
   { href: "/account", label: "Account" },
   { href: "/about", label: "About Us" },
+  { href: "/customization", label: "Customization" },
+  { href: "/certifications", label: "Certifications" },
   { href: "/after-sales", label: "After-sales" },
   { href: "/policies/privacy", label: "Privacy" },
 ];
@@ -91,8 +93,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           <Menu size={20} />
         </button>
         <Link className="brand-mark" href="/" aria-label="Muxcor home">
-          <span>M</span>
-          MUXCOR
+          <Image className="brand-logo" src="/company/muxcor-logo.png" alt="MUXCOR" width={176} height={64} priority />
         </Link>
         <nav className="desktop-nav" aria-label="Shop sections">
           {navItems.map((item) =>
@@ -185,8 +186,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       <footer className="site-footer">
         <div>
           <Link className="brand-mark" href="/" aria-label="Muxcor home">
-            <span>M</span>
-            MUXCOR
+            <Image className="brand-logo" src="/company/muxcor-logo.png" alt="MUXCOR" width={176} height={64} />
           </Link>
           <p>
             Guangzhou Muxcor International Co., Ltd. No. 179 Yingbin Road,
@@ -195,6 +195,8 @@ function Shell({ children }: { children: React.ReactNode }) {
         </div>
         <div className="footer-links">
           <Link href="/about">About us</Link>
+          <Link href="/customization">Customization</Link>
+          <Link href="/certifications">Certifications</Link>
           <Link href="/after-sales">After-sales</Link>
           <Link href="/policies/privacy">Privacy</Link>
           <a href="mailto:gary@muxcor.com">gary@muxcor.com</a>

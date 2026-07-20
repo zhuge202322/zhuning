@@ -5,20 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, FileCheck2, Play, Sparkles } from "lucide-react";
 import { useCart } from "@/components/CartContext";
 import { ProductCard } from "@/components/ProductCard";
+import { certificates, companyStats } from "@/data/company";
 import type { StoreProduct } from "@/lib/storefront-data";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const credentials = [
-  "SGS tested",
-  "ISO 9001 factory certification",
-  "REACH nickel release, lead and cadmium reports",
-  "GPSR EU responsible person support",
-  "German Packaging Act documentation",
-];
 
 const heroSlides = [
   {
@@ -30,7 +23,7 @@ const heroSlides = [
     imageMode: "cover",
   },
   {
-    image: "/media/manufacturing-poster.jpg",
+    image: "/company/manufacturing-capabilities.webp",
     alt: "Premium jewelry manufacturer promotional poster",
     kicker: "Product development",
     title: "From custom design to stable supply.",
@@ -38,7 +31,7 @@ const heroSlides = [
     imageMode: "poster",
   },
   {
-    image: "/media/company-workshop.png",
+    image: "/company/jewelry-studio.webp",
     alt: "Muxcor jewelry workshop in Guangzhou",
     kicker: "Company workshop",
     title: "See the real team behind the catalogue.",
@@ -103,11 +96,11 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
         );
       });
 
-      gsap.to(".atelier-image", {
+      gsap.to(".home-company-primary img", {
         yPercent: -10,
         ease: "none",
         scrollTrigger: {
-          trigger: ".atelier-band",
+          trigger: ".home-company-story",
           start: "top bottom",
           end: "bottom top",
           scrub: 0.8,
@@ -221,10 +214,12 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
       </section>
 
       <section className="proof-strip" aria-label="Store highlights">
-        <span>Necklaces</span>
-        <span>Rings</span>
-        <span>Jewelry sets</span>
-        <span>Inquiry-based sourcing</span>
+        {companyStats.map((stat) => (
+          <span key={stat.label}>
+            <strong>{stat.value}</strong>
+            <small>{stat.label}</small>
+          </span>
+        ))}
       </section>
 
       <section id="collections" className="collection-band reveal">
@@ -311,55 +306,77 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
       </section>
       ) : null}
 
-      <section id="craft" className="atelier-band reveal">
-        <div className="atelier-copy">
-          <p className="section-kicker">Production and showroom</p>
-          <h2>A visible working environment behind every quotation.</h2>
+      <section id="craft" className="home-company-story reveal">
+        <div className="home-company-gallery" aria-label="Muxcor workplace">
+          <figure className="home-company-primary">
+            <Image src="/company/showroom-display.webp" alt="Muxcor jewelry showroom display" fill sizes="(max-width: 860px) 100vw, 48vw" />
+          </figure>
+          <figure>
+            <Image src="/company/production-machines.webp" alt="Muxcor production equipment" fill sizes="(max-width: 860px) 50vw, 24vw" />
+          </figure>
+          <figure>
+            <Image src="/company/jewelry-studio.webp" alt="Muxcor jewelry development studio" fill sizes="(max-width: 860px) 50vw, 24vw" />
+          </figure>
+        </div>
+        <div className="home-company-copy">
+          <p className="section-kicker">Inside Muxcor</p>
+          <h2>A real Guangzhou team behind every product discussion.</h2>
           <p>
-            Guangzhou Muxcor International Co., Ltd. supports product review,
-            sample discussion, customization coordination, and production follow-up
-            for jewelry categories shown in the catalogue.
+            Founded in 2007, Muxcor supports catalogue sourcing, samples, OEM and ODM development,
+            production coordination, packing, and export delivery through one team.
           </p>
-          <div className="atelier-stats">
-            <div>
-              <strong>Rings</strong>
-              <span>Source catalogue</span>
-            </div>
-            <div>
-              <strong>Necklaces</strong>
-              <span>Source catalogue</span>
-            </div>
-            <div>
-              <strong>Sets</strong>
-              <span>Coordinated jewelry</span>
-            </div>
+          <dl>
+            <div><dt>Product scope</dt><dd>Jewelry and fashion accessories</dd></div>
+            <div><dt>Materials</dt><dd>Steel, alloy, copper, pearl, plated finishes</dd></div>
+            <div><dt>Project support</dt><dd>Mixed wholesale, OEM, ODM, and samples</dd></div>
+          </dl>
+          <div className="company-actions">
+            <Link className="primary-link" href="/about">Meet the company <ArrowRight size={18} /></Link>
+            <Link className="secondary-link" href="/customization">Customization process</Link>
           </div>
         </div>
-        <div className="atelier-visual" aria-hidden="true">
-          <Image
-            className="atelier-image"
-            src="/media/company-showroom.png"
-            alt="Muxcor jewelry showroom"
-            width={620}
-            height={620}
-          />
+      </section>
+
+      <section className="home-customization reveal">
+        <div className="home-process-video">
+          <video controls playsInline preload="metadata" poster="/company/custom-made.webp">
+            <source src="/company/craft-process-1.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="home-process-copy">
+          <p className="section-kicker">Custom jewelry</p>
+          <h2>See how a design moves toward production.</h2>
+          <p>Review the brief, develop the design, approve the sample, then coordinate crafting, finishing, packing, and delivery.</p>
+          <div className="home-process-steps" aria-label="Customization steps">
+            <span>01 Brief</span>
+            <span>02 CAD</span>
+            <span>03 Sample</span>
+            <span>04 Production</span>
+          </div>
+          <Link className="primary-link" href="/customization">
+            Explore the full process <Play size={17} />
+          </Link>
         </div>
       </section>
 
       <section id="certifications" className="certification-band reveal">
         <div className="section-heading">
           <div>
-            <p className="section-kicker">Compliance confidence</p>
-            <h2>Company documents available for product and compliance review.</h2>
+            <p className="section-kicker">Documented capabilities</p>
+            <h2>Authentic certificates and representative test reports.</h2>
           </div>
-          <ShieldCheck size={42} aria-hidden="true" />
+          <Link className="secondary-link" href="/certifications">Open document library</Link>
         </div>
-        <div className="credential-grid">
-          {credentials.map((credential) => (
-            <div className="credential-item" key={credential}>
-              <BadgeCheck size={21} />
-              <span>{credential}</span>
-            </div>
+        <div className="home-cert-grid">
+          {certificates.slice(0, 3).map((certificate) => (
+            <Link href="/certifications" key={certificate.title}>
+              <div className="home-cert-image">
+                <Image src={certificate.image} alt={`${certificate.title} cover`} fill sizes="(max-width: 560px) 100vw, 30vw" />
+              </div>
+              <span>{certificate.category}</span>
+              <strong>{certificate.title}</strong>
+              <FileCheck2 size={18} />
+            </Link>
           ))}
         </div>
       </section>
