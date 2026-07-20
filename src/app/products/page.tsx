@@ -16,6 +16,8 @@ type ProductsPageProps = {
 function normalizeCategory(category?: string) {
   if (category === "necklaces") return "Necklaces";
   if (category === "rings") return "Rings";
+  if (category === "jewelry-sets") return "Jewelry Sets";
+  if (category === "bags") return "Women's Bags";
   return "All";
 }
 

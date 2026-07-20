@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { products as fallbackProducts } from "@/data/catalog";
+import fallbackSnapshot from "@/data/storefront-products.json";
 
 export type StoreProduct = {
   id: string;
   dbId: number;
-  category: "Necklaces" | "Rings";
+  category: "Necklaces" | "Rings" | "Jewelry Sets" | "Women's Bags";
   name: string;
   sku: string;
   material: string;
@@ -22,21 +22,30 @@ export type StoreProduct = {
 const fallbackByCategory = {
   Necklaces: "/products/ruby-oval-pendant-necklace.png",
   Rings: "/products/zircon-anniversary-ring.png",
+  "Jewelry Sets": "/uploads/imported-products/6-16-1-id_3339c2ff20ed4c83841ac2c5b1f3f5da.webp",
+  "Women's Bags": "/media/company-showroom.png",
 };
 
-const fallbackStoreProducts: StoreProduct[] = fallbackProducts.map((product, index) => ({
-  ...product,
-  dbId: index + 1,
-  images: [product.image],
-}));
+const fallbackStoreProducts = fallbackSnapshot as StoreProduct[];
 
 function stripHtml(value: string) {
   return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-function normalizeCategory(product: any): "Necklaces" | "Rings" {
-  const category = product.categories?.[0]?.name || product.sourceCategory || "";
-  return /ring/i.test(category) ? "Rings" : "Necklaces";
+function normalizeCategory(product: any): StoreProduct["category"] {
+  const assignedCategory = product.categories?.[0]?.name;
+  if (["Necklaces", "Rings", "Jewelry Sets", "Women's Bags"].includes(assignedCategory)) {
+    return assignedCategory as StoreProduct["category"];
+  }
+  const category = [
+    product.sourceCategory,
+    product.name,
+  ].filter(Boolean).join(" ");
+
+  if (/handbag|women'?s bag|\bbag\b/i.test(category)) return "Women's Bags";
+  if (/jewel(?:ry|lery) sets?|necklaces? for women set|\bsets?\b/i.test(category)) return "Jewelry Sets";
+  if (/ring/i.test(category)) return "Rings";
+  return "Necklaces";
 }
 
 export function formatStoreProduct(product: any): StoreProduct {
@@ -45,25 +54,36 @@ export function formatStoreProduct(product: any): StoreProduct {
     ? product.images.map((image: any) => image.src)
     : [fallbackByCategory[category]];
   const price = Number(product.price || 0);
+  const sku = product.sourceSku || product.skus?.[0]?.name || `MX-${product.id}`;
+  const sourceNote = stripHtml(product.shortDescription || product.description || "");
+  const note = /piece with .*cm/i.test(sourceNote)
+    ? `${product.material || "Product"} item listed under source SKU ${sku}.`
+    : sourceNote || `${product.material || "Product"} item listed under source SKU ${sku}.`;
 
   return {
     id: product.slug,
     dbId: product.id,
     category,
     name: product.name,
-    sku: product.sourceSku || product.skus?.[0]?.name || `MX-${product.id}`,
+    sku,
     material: product.material || "Jewelry alloy",
-    price: price > 0 ? Math.round(price * 55) : 98,
+    price: price > 0 ? Math.round(price * 100) / 100 : 0,
     image: images[0],
     images,
     weight: product.weight ? `${product.weight}g`.replace(/gg$/i, "g") : "15g",
-    packaging: product.packaging || "20cm x 16cm x 5cm",
-    note:
-      stripHtml(product.shortDescription || product.description || "") ||
-      "A polished Muxcor jewelry piece selected for the Crimson Drop edit.",
+    packaging: product.packaging || "Confirmed with quotation",
+    note,
     finish: product.material || "Polished finish",
     stones: product.stones || (category === "Rings" ? "Statement setting" : "Pearl and crystal accents"),
-    collection: product.collection || (category === "Rings" ? "Obsidian Statement" : "Liquid Pearl Lines"),
+    collection:
+      product.collection ||
+      (category === "Rings"
+        ? "Rings"
+        : category === "Jewelry Sets"
+          ? "Jewelry Sets"
+          : category === "Women's Bags"
+            ? "Women's Bags"
+            : "Necklaces"),
   };
 }
 

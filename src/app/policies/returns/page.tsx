@@ -30,7 +30,7 @@ export default function ReturnsPage() {
     <PolicyPage
       eyebrow="Returns and exchanges"
       title="Clear commitments for jewelry care after purchase."
-      intro="A luxury purchase should feel considered after checkout too. This page gives customers a calm, transparent return and exchange path."
+      intro="After-sales review is based on the confirmed product, quotation, and delivery records. This page outlines the return and exchange path."
       sections={sections}
     />
   );

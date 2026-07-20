@@ -5,28 +5,16 @@ import Link from "next/link";
 import { Heart, PackageCheck, ShieldCheck, ShoppingBag, Sparkles, Truck, X } from "lucide-react";
 import { useCart } from "@/components/CartContext";
 import { PageMotion } from "@/components/PageMotion";
+import { formatProductPrice } from "@/lib/currency";
 
-const orders = [
-  {
-    id: "MX-24018",
-    title: "Crimson Gemstone Statement Ring",
-    status: "Preparing",
-    eta: "Ships in 2 business days",
-  },
-  {
-    id: "MX-24011",
-    title: "Layered Pearl Collarbone Necklace",
-    status: "Delivered",
-    eta: "Arrived Jun 21",
-  },
-];
+const orders: { id: string; title: string; status: string; eta: string }[] = [];
 
 export function AccountView() {
   const { addToCart, removeFromWishlist, wishlist, wishlistCount } = useCart();
   const accountStats = [
     { label: "Saved pieces", value: String(wishlistCount), icon: Heart },
-    { label: "Active orders", value: "2", icon: PackageCheck },
-    { label: "Private previews", value: "4", icon: Sparkles },
+    { label: "Active orders", value: "0", icon: PackageCheck },
+    { label: "Inquiry cart", value: "Open", icon: Sparkles },
   ];
 
   return (
@@ -81,6 +69,13 @@ export function AccountView() {
                 </div>
               </article>
             ))}
+            {orders.length === 0 ? (
+              <div className="mini-empty-state">
+                <PackageCheck size={24} />
+                <p>No confirmed orders are linked to this local account yet.</p>
+                <Link className="secondary-link" href="/inquiry-cart">Review inquiry cart</Link>
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -107,7 +102,7 @@ export function AccountView() {
                   <Link href={`/products/${product.id}`}>
                     <Image src={product.image} alt={product.name} width={72} height={72} />
                     <span>{product.name}</span>
-                    <strong>${product.price}</strong>
+                    <strong>{formatProductPrice(product.price)}</strong>
                   </Link>
                   <div className="mini-product-actions">
                     <button type="button" aria-label={`Add ${product.name} to bag`} onClick={() => addToCart(product)}>
@@ -137,6 +132,7 @@ export function AccountView() {
           <div>
             <Link href="/policies/returns">Returns policy</Link>
             <Link href="/policies/privacy">Privacy policy</Link>
+            <Link href="/inquiry-cart">Inquiry cart</Link>
           </div>
         </div>
       </section>

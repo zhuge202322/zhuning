@@ -9,6 +9,7 @@
     "lint": "eslint",
     "db:push": "prisma db push",
     "db:import-products": "node scripts/import-products.mjs",
+    "catalog:export": "node scripts/export-storefront-fallback.mjs",
     "images:optimize": "node scripts/optimize-product-images.mjs"
   },
   "dependencies": {

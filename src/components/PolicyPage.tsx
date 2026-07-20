@@ -32,11 +32,11 @@ export function PolicyPage({
           <BadgeCheck size={24} />
           <h2>Commitment summary</h2>
           <p>
-            Muxcor keeps care, returns, and privacy language clear so every
-            jewelry order feels considered from selection to aftercare.
+            Muxcor keeps inquiry, after-sales, and privacy language clear from
+            product selection through delivery follow-up.
           </p>
           <Link href="/products">
-            Continue shopping <ArrowRight size={17} />
+            Continue browsing <ArrowRight size={17} />
           </Link>
         </aside>
         <div className="policy-content">

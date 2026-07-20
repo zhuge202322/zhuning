@@ -2,12 +2,13 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import { PageMotion } from "@/components/PageMotion";
 import { ProductCard } from "@/components/ProductCard";
+import { formatProductPrice } from "@/lib/currency";
 import type { StoreProduct } from "@/lib/storefront-data";
 
 type Category = "All" | StoreProduct["category"];
 type SortMode = "Featured" | "Price Low" | "Price High";
 
-const categories: Category[] = ["All", "Necklaces", "Rings"];
+const categories: Category[] = ["All", "Necklaces", "Rings", "Jewelry Sets", "Women's Bags"];
 const sortModes: SortMode[] = ["Featured", "Price Low", "Price High"];
 
 const sortParamByMode: Record<SortMode, string> = {
@@ -17,12 +18,14 @@ const sortParamByMode: Record<SortMode, string> = {
 };
 
 function formatPrice(price: number) {
-  return `$${Math.round(price).toLocaleString("en-US")}`;
+  return formatProductPrice(price);
 }
 
 function categoryParam(category: Category) {
   if (category === "Necklaces") return "necklaces";
   if (category === "Rings") return "rings";
+  if (category === "Jewelry Sets") return "jewelry-sets";
+  if (category === "Women's Bags") return "bags";
   return "";
 }
 
@@ -47,6 +50,8 @@ export function ProductListView({
     All: products.length,
     Necklaces: products.filter((product) => product.category === "Necklaces").length,
     Rings: products.filter((product) => product.category === "Rings").length,
+    "Jewelry Sets": products.filter((product) => product.category === "Jewelry Sets").length,
+    "Women's Bags": products.filter((product) => product.category === "Women's Bags").length,
   };
   const prices = products.map((product) => product.price);
   const priceRange = {
@@ -89,10 +94,10 @@ export function ProductListView({
       <PageMotion />
       <section className="page-hero compact page-reveal">
         <p className="section-kicker">Exquisite collections</p>
-        <h1>Shop rings and necklaces shaped for evening light.</h1>
+        <h1>Browse the full Muxcor product framework.</h1>
         <p>
-          Browse the Crimson Drop edit from Muxcor: pearl necklaces, rhinestone
-          chokers, sculpted bands, and deep red statement rings.
+          Browse necklaces, rings, jewelry sets, and the women&apos;s bags sourcing
+          category. Select a product and send an inquiry for pricing and packing details.
         </p>
       </section>
 
@@ -183,10 +188,22 @@ export function ProductListView({
 
           <section className="product-section listing-section" aria-label="All products">
             <div className="product-grid">
-              {filteredProducts.map((product, index) => (
-                <ProductCard product={product} motionIndex={index} key={product.id} />
-              ))}
-            </div>
+            {filteredProducts.map((product, index) => (
+              <ProductCard product={product} motionIndex={index} key={product.id} />
+            ))}
+            {filteredProducts.length === 0 ? (
+              <div className="catalog-empty-state">
+                <h2>Women&apos;s bags catalogue</h2>
+                <p>
+                  Current bag styles are handled through the sourcing team. Send an inquiry
+                  and we will return the available catalogue for your market.
+                </p>
+                <a className="primary-link" href="mailto:gary@muxcor.com?subject=Women%27s%20bags%20catalogue%20request">
+                  Contact sourcing team
+                </a>
+              </div>
+            ) : null}
+          </div>
           </section>
         </div>
       </section>

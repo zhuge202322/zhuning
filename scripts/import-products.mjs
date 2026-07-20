@@ -122,11 +122,16 @@ function classifyProduct(sheetName, sourceCategory, name) {
   const source = `${sheetName} ${sourceCategory}`.toLowerCase();
   const productName = String(name || "").toLowerCase();
 
+  if (/jewel(?:ry|lery) sets?|necklaces? for women set|\bsets?\b/.test(`${source} ${productName}`)) {
+    return "Jewelry Sets";
+  }
   if (/\bring(s)?\b/.test(source)) return "Rings";
   if (/necklace|pendant|choker|collarbone/.test(source)) return "Necklaces";
-  if (/bracelet|bangle|earring|bag|handbag/.test(source)) return "";
+  if (/bag|handbag/.test(source)) return "Women's Bags";
+  if (/bracelet|bangle|earring/.test(source)) return "";
   if (/\bring(s)?\b/.test(productName)) return "Rings";
   if (/necklace|pendant|choker|collarbone/.test(productName)) return "Necklaces";
+  if (/bag|handbag/.test(productName)) return "Women's Bags";
 
   return "";
 }
@@ -187,7 +192,7 @@ function productDescription(item) {
     `<li>SKU: ${item.sku}</li>`,
     `<li>Source category: ${item.sourceCategory || item.category}</li>`,
     `<li>Weight: ${item.weight || "15g"}</li>`,
-    `<li>Packaging: ${item.packaging || "20cm*16cm*5cm"}</li>`,
+    `<li>Packing reference: ${item.packaging || "Confirmed with quotation"}</li>`,
     `</ul>`,
   ].join("");
 }
@@ -201,7 +206,7 @@ async function upsertProduct(item, category, index, imageMap) {
     : ["/products/ruby-oval-pendant-necklace.png", "/products/pearl-layered-necklace.png"];
 
   const finalImages = images.length ? images : fallbackImages;
-  const shortDescription = `${item.material || "Luxury jewelry"} piece with ${item.packaging || "gift-ready packaging"}.`;
+  const shortDescription = `${item.material || "Jewelry"} piece. Packing details are confirmed for each SKU.`;
   const sourceCategory = item.sourceCategory || item.category;
 
   await prisma.product.upsert({
@@ -251,7 +256,7 @@ async function upsertProduct(item, category, index, imageMap) {
       price: item.price,
       weight: item.weight,
       packaging: item.packaging,
-      collection: category.name === "Rings" ? "Obsidian Statement" : "Liquid Pearl Lines",
+      collection: category.name,
       featured: index <= 8,
       sortOrder: index,
       categories: { connect: [{ id: category.id }] },
@@ -286,61 +291,6 @@ async function seedAdmin() {
   });
 }
 
-async function seedCustomersAndOrders() {
-  const customer = await prisma.customer.upsert({
-    where: { email: "client@example.com" },
-    update: {},
-    create: {
-      name: "Avery Stone",
-      email: "client@example.com",
-      phone: "+1 212 555 0188",
-      notes: "Private client interested in crimson statement rings.",
-    },
-  });
-
-  const products = await prisma.product.findMany({
-    take: 2,
-    orderBy: { sortOrder: "asc" },
-    include: { images: { take: 1, orderBy: { sortOrder: "asc" } } },
-  });
-  if (!products.length) return;
-
-  const subtotal = products.reduce((sum, product) => sum + Number(product.price || 0), 0);
-  const shipping = 18;
-  await prisma.order.upsert({
-    where: { orderNumber: "MX-24018" },
-    update: {},
-    create: {
-      orderNumber: "MX-24018",
-      customerId: customer.id,
-      customerName: customer.name,
-      customerEmail: customer.email,
-      status: "Preparing",
-      paymentStatus: "Paid",
-      fulfillmentStatus: "Unfulfilled",
-      subtotal,
-      shipping,
-      total: subtotal + shipping,
-      notes: "Gift packaging requested.",
-      items: {
-        create: products.map((product) => ({
-          productId: product.id,
-          productName: product.name,
-          sku: product.sourceSku,
-          image: product.images[0]?.src || "",
-          quantity: 1,
-          price: Number(product.price || 0),
-        })),
-      },
-    },
-  });
-
-  await prisma.customer.update({
-    where: { id: customer.id },
-    data: { totalOrders: 1, totalSpend: subtotal + shipping },
-  });
-}
-
 async function main() {
   const workbookPaths = getWorkbookPaths();
   if (!workbookPaths.length) throw new Error(`No .xlsx workbooks found in ${sourceRoot}`);
@@ -348,7 +298,15 @@ async function main() {
   await seedAdmin();
   const necklaceCategory = await ensureCategory("Necklaces", 1);
   const ringCategory = await ensureCategory("Rings", 2);
-  const totals = { Necklaces: 0, Rings: 0 };
+  const jewelrySetCategory = await ensureCategory("Jewelry Sets", 3);
+  const womensBagsCategory = await ensureCategory("Women's Bags", 4);
+  const categoryByName = {
+    Necklaces: necklaceCategory,
+    Rings: ringCategory,
+    "Jewelry Sets": jewelrySetCategory,
+    "Women's Bags": womensBagsCategory,
+  };
+  const totals = { Necklaces: 0, Rings: 0, "Jewelry Sets": 0, "Women's Bags": 0 };
   let index = 1;
 
   for (const workbookPath of workbookPaths) {
@@ -358,16 +316,16 @@ async function main() {
     const products = readProducts(workbook, workbookPath);
 
     for (const item of products) {
-      const category = item.category === "Rings" ? ringCategory : necklaceCategory;
+      const category = categoryByName[item.category];
       await upsertProduct(item, category, index, imageMap);
       totals[item.category] += 1;
       index += 1;
     }
   }
 
-  await seedCustomersAndOrders();
-
-  console.log(`Imported ${totals.Necklaces} necklaces and ${totals.Rings} rings from ${workbookPaths.length} workbook(s).`);
+  console.log(
+    `Imported ${totals.Necklaces} necklaces, ${totals.Rings} rings, and ${totals["Jewelry Sets"]} jewelry sets from ${workbookPaths.length} workbook(s).`,
+  );
   console.log("Admin login: admin / admin123456");
 }
 

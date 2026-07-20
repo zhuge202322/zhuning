@@ -18,13 +18,13 @@ export function AuthView() {
           <p className="section-kicker">Private client access</p>
           <h1>{mode === "signin" ? "Welcome back to the crimson list." : "Join the Muxcor maison."}</h1>
           <p>
-            Keep wishlisted rings, checkout preferences, order history, and early
-            access notes in one polished client space.
+            Keep wishlisted products, inquiry preferences, and request history
+            in one client space.
           </p>
           <div className="auth-benefits">
             <span>
               <ShieldCheck size={18} />
-              Protected checkout profile
+              Protected client profile
             </span>
             <span>
               <LockKeyhole size={18} />

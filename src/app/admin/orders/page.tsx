@@ -24,7 +24,7 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-bold text-slate-800">Orders ({orders.length})</h2>
-          <p className="text-sm text-slate-500 mt-1">Track B2C customer orders, payment, and fulfillment.</p>
+          <p className="text-sm text-slate-500 mt-1">Review product inquiries and track confirmed customer orders.</p>
         </div>
         {customer ? (
           <Link href="/admin/orders" className="text-sm font-bold text-brand-primary hover:underline">
@@ -76,13 +76,19 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
               ))}
             </div>
 
+            {order.notes ? (
+              <div className="mt-4 whitespace-pre-line rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
+                {order.notes}
+              </div>
+            ) : null}
+
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
               <div className="flex items-center gap-2 text-sm text-slate-500">
                 <Truck className="w-4 h-4" />
                 Created {order.createdAt.toISOString().slice(0, 10)}
               </div>
               <div className="text-right">
-                <div className="text-xs text-slate-500">Total</div>
+                <div className="text-xs text-slate-500">Product value</div>
                 <div className="text-xl font-extrabold text-slate-900">
                   {order.currency} ${Number(order.total).toFixed(2)}
                 </div>

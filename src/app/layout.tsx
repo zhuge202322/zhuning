@@ -17,8 +17,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata = {
-  title: "Muxcor | Crimson Drop Luxury Jewelry",
-  description: "English B2C luxury jewelry storefront and admin panel.",
+  title: "Muxcor | Jewelry Catalogue & Product Inquiry",
+  description: "English product catalogue and inquiry workflow for Muxcor jewelry and sourcing categories.",
 };
 
 export default async function RootLayout({

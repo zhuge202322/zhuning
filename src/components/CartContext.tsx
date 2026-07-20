@@ -14,6 +14,7 @@ type CartContextValue = {
   subtotal: number;
   wishlistCount: number;
   addToCart: (product: StoreProduct) => void;
+  clearCart: () => void;
   updateQuantity: (productId: string, delta: number) => void;
   toggleWishlist: (product: StoreProduct) => void;
   removeFromWishlist: (productId: string) => void;
@@ -102,6 +103,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  const clearCart = useCallback(() => {
+    setCart([]);
+    setCartOpen(false);
+  }, []);
+
   const toggleWishlist = useCallback((product: StoreProduct) => {
     const alreadySaved = wishlist.some((item) => item.id === product.id);
     setWishlist((current) => {
@@ -150,6 +156,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       subtotal,
       wishlistCount,
       addToCart,
+      clearCart,
       updateQuantity,
       toggleWishlist,
       removeFromWishlist,
@@ -163,6 +170,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       addToCart,
       cart,
       cartOpen,
+      clearCart,
       closeCart,
       closeWishlist,
       isWishlisted,

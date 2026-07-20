@@ -5,34 +5,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
 import { useCart } from "@/components/CartContext";
+import { formatProductPrice } from "@/lib/currency";
 import type { StoreProduct } from "@/lib/storefront-data";
-
-function getCompactProductName(product: StoreProduct) {
-  const name = product.name.toLowerCase();
-
-  if (product.category === "Rings") {
-    if (name.includes("wedding")) return "Zircon Wedding Ring";
-    if (name.includes("arabic")) return "Arabic Chunky Ring";
-    if (name.includes("gemstone")) return "Gemstone Statement Ring";
-    if (name.includes("obsidian")) return "Obsidian Statement Ring";
-    if (name.includes("pink")) return "Pink Zircon Ring";
-    if (name.includes("full diamond")) return "Full Zircon Ring";
-    return "Sculptural Statement Ring";
-  }
-
-  if (name.includes("pearl") && name.includes("layer")) return "Layered Pearl Necklace";
-  if (name.includes("pearl")) return "Pearl Strand Necklace";
-  if (name.includes("choker")) return "Rhinestone Choker";
-  if (name.includes("pendant")) return "Oval Pendant Necklace";
-  if (name.includes("tennis")) return "Crystal Tennis Necklace";
-  if (name.includes("flower")) return "Crystal Flower Necklace";
-  return "Polished Chain Necklace";
-}
 
 export function ProductCard({ motionIndex = 0, product }: { motionIndex?: number; product: StoreProduct }) {
   const { addToCart, isWishlisted, toggleWishlist } = useCart();
   const [justAdded, setJustAdded] = useState(false);
-  const displayName = getCompactProductName(product);
   const saved = isWishlisted(product.id);
 
   useEffect(() => {
@@ -75,7 +53,7 @@ export function ProductCard({ motionIndex = 0, product }: { motionIndex?: number
         <span>{product.category}</span>
         <h3>
           <Link href={`/products/${product.id}`} title={product.name}>
-            {displayName}
+            {product.name}
           </Link>
         </h3>
         <dl>
@@ -89,10 +67,10 @@ export function ProductCard({ motionIndex = 0, product }: { motionIndex?: number
           </div>
         </dl>
         <div className="product-footer">
-          <strong>${product.price}</strong>
+          <strong>{formatProductPrice(product.price)}</strong>
           <button type="button" onClick={handleAdd} className={justAdded ? "is-added" : ""}>
             <ShoppingBag size={17} />
-            {justAdded ? "Added" : "Add"}
+            {justAdded ? "Added" : "Inquire"}
           </button>
         </div>
       </div>

@@ -15,12 +15,15 @@ import {
   X,
 } from "lucide-react";
 import { CartProvider, useCart } from "@/components/CartContext";
+import { formatProductPrice } from "@/lib/currency";
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: "/products", label: "Products" },
+  { href: "/products", label: "Jewelry" },
+  { href: "/collections/womens-bags", label: "Women's Bags" },
   { href: "/account", label: "Account" },
-  { href: "/policies/returns", label: "Returns" },
+  { href: "/about", label: "About Us" },
+  { href: "/after-sales", label: "After-sales" },
   { href: "/policies/privacy", label: "Privacy" },
 ];
 
@@ -30,14 +33,21 @@ const productMegaMenu = [
     title: "Necklaces",
     copy: "Pearl layers, chokers, pendants, and evening chains.",
     image: "/products/pearl-layered-necklace.png",
-    stat: "125 pieces",
+    stat: "Necklaces",
   },
   {
     href: "/products?category=rings",
     title: "Rings",
     copy: "Statement stones, sculptural bands, and polished settings.",
     image: "/products/zircon-anniversary-ring.png",
-    stat: "61 pieces",
+    stat: "Rings",
+  },
+  {
+    href: "/products?category=jewelry-sets",
+    title: "Jewelry Sets",
+    copy: "Coordinated styles from the source catalogue.",
+    image: "/uploads/imported-products/6-16-1-id_3339c2ff20ed4c83841ac2c5b1f3f5da.webp",
+    stat: "Jewelry sets",
   },
 ];
 
@@ -86,7 +96,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         </Link>
         <nav className="desktop-nav" aria-label="Shop sections">
           {navItems.map((item) =>
-            item.label === "Products" ? (
+            item.href === "/products" ? (
               <div className="nav-item has-mega" key={item.href}>
                 <Link className="nav-link" href={item.href}>
                   {item.label}
@@ -104,7 +114,9 @@ function Shell({ children }: { children: React.ReactNode }) {
                     <div className="mega-card-grid">
                       {productMegaMenu.map((categoryItem) => (
                         <Link className="mega-card" href={categoryItem.href} key={categoryItem.title}>
-                          <Image src={categoryItem.image} alt="" width={156} height={156} />
+                          <div className="mega-card-image" aria-hidden="true">
+                            <Image src={categoryItem.image} alt="" fill sizes="156px" />
+                          </div>
                           <span>{categoryItem.stat}</span>
                           <strong>{categoryItem.title}</strong>
                           <p>{categoryItem.copy}</p>
@@ -139,7 +151,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           </Link>
           <button
             className="bag-button"
-            aria-label={`Open shopping bag with ${totalItems} items`}
+            aria-label={`Open inquiry cart with ${totalItems} items`}
             onClick={openCart}
           >
             <ShoppingBag size={19} />
@@ -160,6 +172,12 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Link href="/products?category=rings" onClick={() => setMobileMenuOpen(false)}>
           Rings
         </Link>
+        <Link href="/products?category=jewelry-sets" onClick={() => setMobileMenuOpen(false)}>
+          Jewelry sets
+        </Link>
+        <Link href="/inquiry-cart" onClick={() => setMobileMenuOpen(false)}>
+          Inquiry cart
+        </Link>
       </nav>
 
       <main id="main">{children}</main>
@@ -175,7 +193,12 @@ function Shell({ children }: { children: React.ReactNode }) {
             Guangzhou City, Guangdong Province, China.
           </p>
         </div>
-        <a href="mailto:gary@muxcor.com">gary@muxcor.com</a>
+        <div className="footer-links">
+          <Link href="/about">About us</Link>
+          <Link href="/after-sales">After-sales</Link>
+          <Link href="/policies/privacy">Privacy</Link>
+          <a href="mailto:gary@muxcor.com">gary@muxcor.com</a>
+        </div>
       </footer>
 
       <div className={`cart-scrim ${panelOpen ? "open" : ""}`} onClick={closePanels} />
@@ -208,11 +231,11 @@ function Shell({ children }: { children: React.ReactNode }) {
                   <Link href={`/products/${item.id}`} onClick={closeWishlist}>
                     <strong>{item.name}</strong>
                   </Link>
-                  <span>${item.price}</span>
+                  <span>{formatProductPrice(item.price)}</span>
                   <div className="wishlist-line-actions">
                     <button type="button" onClick={() => addToCart(item)}>
                       <ShoppingBag size={15} />
-                      Add to bag
+                      Add to inquiry
                     </button>
                     <button type="button" onClick={() => removeFromWishlist(item.id)}>
                       Remove
@@ -224,26 +247,26 @@ function Shell({ children }: { children: React.ReactNode }) {
           )}
         </div>
       </aside>
-      <aside className={`cart-drawer ${cartOpen ? "open" : ""}`} aria-label="Shopping bag">
+      <aside className={`cart-drawer ${cartOpen ? "open" : ""}`} aria-label="Inquiry cart">
         <div className="cart-header">
           <div>
-            <span>Shopping bag</span>
+            <span>Inquiry cart</span>
             <strong>{totalItems} items</strong>
           </div>
-          <button className="icon-button" aria-label="Close shopping bag" onClick={closeCart} type="button">
+          <button className="icon-button" aria-label="Close inquiry cart" onClick={closeCart} type="button">
             <X size={20} />
           </button>
         </div>
         <div className="cart-lines">
           {cart.length === 0 ? (
-            <p className="empty-cart">Your bag is ready for rings and necklaces.</p>
+            <p className="empty-cart">Add products to prepare a quotation inquiry.</p>
           ) : (
             cart.map((item) => (
               <div className="cart-line" key={item.id}>
                 <Image src={item.image} alt={item.name} width={86} height={86} />
                 <div>
                   <strong>{item.name}</strong>
-                  <span>${item.price}</span>
+                  <span>{formatProductPrice(item.price)}</span>
                   <div className="quantity-controls">
                     <button aria-label={`Decrease ${item.name}`} onClick={() => updateQuantity(item.id, -1)}>
                       <Minus size={15} />
@@ -260,12 +283,17 @@ function Shell({ children }: { children: React.ReactNode }) {
         </div>
         <div className="cart-footer">
           <div>
-            <span>Subtotal</span>
-            <strong>${subtotal}</strong>
+            <span>Product total</span>
+            <strong>{formatProductPrice(subtotal)}</strong>
           </div>
-          <button type="button" disabled={cart.length === 0}>
-            Continue to checkout
-          </button>
+          <Link
+            className={`cart-submit ${cart.length === 0 ? "disabled" : ""}`}
+            href={cart.length === 0 ? "#" : "/inquiry-cart"}
+            onClick={cart.length === 0 ? undefined : closeCart}
+            aria-disabled={cart.length === 0}
+          >
+            Review and send inquiry <ChevronRight size={17} />
+          </Link>
         </div>
       </aside>
     </div>

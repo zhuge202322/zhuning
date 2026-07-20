@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, BadgeCheck, Heart, Ruler, ShieldCheck, Sparkles 
 import { useCart } from "@/components/CartContext";
 import { PageMotion } from "@/components/PageMotion";
 import { ProductCard } from "@/components/ProductCard";
+import { formatProductPrice } from "@/lib/currency";
 import type { StoreProduct } from "@/lib/storefront-data";
 
 export function ProductDetailView({
@@ -113,14 +114,14 @@ function ProductGallery({
           <p className="section-kicker">{product.collection}</p>
           <h1>{product.name}</h1>
           <p className="detail-note">{product.note}</p>
-          <strong className="detail-price">${product.price}</strong>
+          <strong className="detail-price">{formatProductPrice(product.price)}</strong>
           <div className="detail-actions">
             <button
               className={`primary-link ${justAdded ? "is-added" : ""}`}
               type="button"
               onClick={addCurrentProduct}
             >
-              {justAdded ? "Added to bag" : "Add to bag"} <ArrowRight size={18} />
+              {justAdded ? "Added to inquiry cart" : "Add to inquiry cart"} <ArrowRight size={18} />
             </button>
             <button
               className={`secondary-link wishlist-action ${saved ? "active" : ""}`}
@@ -146,7 +147,7 @@ function ProductGallery({
             </div>
             <div>
               <Ruler size={20} />
-              <span>Packaging</span>
+              <span>Packing reference</span>
               <strong>{product.packaging}</strong>
             </div>
             <div>
@@ -159,9 +160,9 @@ function ProductGallery({
           <div className="detail-panel">
             <h2>Care and assurance</h2>
             <p>
-              Store separately in the gift box, avoid direct perfume contact,
-              and clean gently with a soft dry cloth. Muxcor production is backed
-              by material testing and export-ready documentation.
+              Keep the piece dry, avoid direct perfume contact, and clean it
+              gently with a soft cloth. Final packing and shipment details are
+              confirmed with the quotation for each SKU.
             </p>
           </div>
         </div>

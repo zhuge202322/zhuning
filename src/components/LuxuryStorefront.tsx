@@ -25,22 +25,25 @@ const heroSlides = [
     image: "/products/ruby-oval-pendant-necklace.png",
     alt: "Ruby oval pendant necklace on a crimson luxury background",
     kicker: "Crimson Drop Luxury",
-    title: "Rings and necklaces with a deep red signature.",
-    copy: "Discover Muxcor jewelry pieces shaped for modern evening wardrobes: luminous pearls, sculptural rings, and crystal chokers from Guangzhou.",
+    title: "Jewelry categories, sourced with clarity.",
+    copy: "Browse the supplied catalogue for necklaces, rings, and coordinated jewelry sets, with original SKU titles and prices.",
+    imageMode: "cover",
   },
   {
-    image: "/products/rhinestone-choker-necklace.png",
-    alt: "Rhinestone choker necklace in evening light",
-    kicker: "Evening necklaces",
-    title: "Crystal collars made for the first glance.",
-    copy: "Layered shine, pearl softness, and formal silhouettes bring a polished finish to occasion dressing.",
+    image: "/media/manufacturing-poster.jpg",
+    alt: "Premium jewelry manufacturer promotional poster",
+    kicker: "Product development",
+    title: "From custom design to stable supply.",
+    copy: "Review design direction, craftsmanship, and supply requirements with the Muxcor team before quotation.",
+    imageMode: "poster",
   },
   {
-    image: "/products/zircon-anniversary-ring.png",
-    alt: "Crimson gemstone statement ring",
-    kicker: "Statement rings",
-    title: "Sculptural rings with a crimson pulse.",
-    copy: "Bold stones, warm metal finishes, and confident profiles give every hand movement a jewel-box presence.",
+    image: "/media/company-workshop.png",
+    alt: "Muxcor jewelry workshop in Guangzhou",
+    kicker: "Company workshop",
+    title: "See the real team behind the catalogue.",
+    copy: "Our Guangzhou workspace supports product review, sample discussion, and jewelry production coordination.",
+    imageMode: "cover",
   },
 ];
 
@@ -169,7 +172,7 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
     <>
       <section className="hero-section" aria-labelledby="hero-title">
         <Image
-          className="hero-slide-image"
+          className={`hero-slide-image ${slide.imageMode === "poster" ? "is-poster" : ""}`}
           src={slide.image}
           alt={slide.alt}
           fill
@@ -186,10 +189,10 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
           <p className="hero-copy">{slide.copy}</p>
           <div className="hero-actions">
             <Link className="primary-link" href="/products">
-              Shop the edit <ArrowRight size={18} />
+              Browse products <ArrowRight size={18} />
             </Link>
-            <Link className="secondary-link" href="/policies/returns">
-              View commitments
+            <Link className="secondary-link" href="/about">
+              About the company
             </Link>
           </div>
         </div>
@@ -218,16 +221,16 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
       </section>
 
       <section className="proof-strip" aria-label="Store highlights">
-        <span>200+ global brand partners</span>
-        <span>Certified material testing</span>
-        <span>Flexible jewelry customization</span>
-        <span>Private client shopping experience</span>
+        <span>Necklaces</span>
+        <span>Rings</span>
+        <span>Jewelry sets</span>
+        <span>Inquiry-based sourcing</span>
       </section>
 
       <section id="collections" className="collection-band reveal">
         <div>
-          <p className="section-kicker">Editorial collections</p>
-          <h2>Two high-jewelry moods, one crimson house code.</h2>
+          <p className="section-kicker">Product categories</p>
+          <h2>A clear product framework for faster sourcing.</h2>
         </div>
         <div className="collection-grid">
           <article className="collection-panel necklace-panel">
@@ -248,14 +251,20 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
             </p>
             <Link href="/products?category=rings">Explore rings</Link>
           </article>
+          <article className="collection-panel set-panel">
+            <span>Jewelry sets</span>
+            <h3>Coordinated Sets</h3>
+            <p>Matching necklace, earring, ring, and bracelet combinations from the supplied catalogue.</p>
+            <Link href="/products?category=jewelry-sets">Explore jewelry sets</Link>
+          </article>
         </div>
       </section>
 
       <section id="products" className="product-section reveal" aria-labelledby="products-title">
         <div className="section-heading">
           <div>
-            <p className="section-kicker">Shop the edit</p>
-            <h2 id="products-title">Featured rings and necklaces</h2>
+            <p className="section-kicker">Current catalogue</p>
+            <h2 id="products-title">Featured products from the supplied files</h2>
           </div>
           <Link className="secondary-link" href="/products">
             View all products
@@ -279,15 +288,15 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
           <p>{activeProduct.note}</p>
           <div className="detail-list">
             <span>{activeProduct.material}</span>
-            <span>{activeProduct.weight}</span>
-            <span>{activeProduct.packaging}</span>
+            <span>{activeProduct.category}</span>
+            <span>SKU {activeProduct.sku}</span>
           </div>
           <button
             type="button"
             className={`primary-link ${selectedAdded ? "is-added" : ""}`}
             onClick={addSelectedProduct}
           >
-            {selectedAdded ? "Added to bag" : "Add selected piece"} <ArrowRight size={18} />
+            {selectedAdded ? "Added to inquiry cart" : "Add to inquiry cart"} <ArrowRight size={18} />
           </button>
         </div>
         <div className="spotlight-image-frame">
@@ -304,34 +313,33 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
 
       <section id="craft" className="atelier-band reveal">
         <div className="atelier-copy">
-          <p className="section-kicker">The Muxcor atelier</p>
-          <h2>Designed for polished consumer storytelling, backed by manufacturing depth.</h2>
+          <p className="section-kicker">Production and showroom</p>
+          <h2>A visible working environment behind every quotation.</h2>
           <p>
-            Guangzhou Muxcor International Co., Ltd. supports jewelry lines with
-            trend-forward design, flexible customization, certified materials,
-            and one-stop production service for rings, necklaces, bracelets,
-            earrings, and jewelry sets.
+            Guangzhou Muxcor International Co., Ltd. supports product review,
+            sample discussion, customization coordination, and production follow-up
+            for jewelry categories shown in the catalogue.
           </p>
           <div className="atelier-stats">
             <div>
-              <strong>200+</strong>
-              <span>Global brand partners</span>
+              <strong>Rings</strong>
+              <span>Source catalogue</span>
             </div>
             <div>
-              <strong>6 pcs</strong>
-              <span>Flexible sample MOQ reference</span>
+              <strong>Necklaces</strong>
+              <span>Source catalogue</span>
             </div>
             <div>
-              <strong>5 cm</strong>
-              <span>Gift-ready box depth</span>
+              <strong>Sets</strong>
+              <span>Coordinated jewelry</span>
             </div>
           </div>
         </div>
         <div className="atelier-visual" aria-hidden="true">
           <Image
             className="atelier-image"
-            src="/products/pearl-layered-necklace.png"
-            alt=""
+            src="/media/company-showroom.png"
+            alt="Muxcor jewelry showroom"
             width={620}
             height={620}
           />
@@ -342,7 +350,7 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
         <div className="section-heading">
           <div>
             <p className="section-kicker">Compliance confidence</p>
-            <h2>Credentials ready for global jewelry shoppers.</h2>
+            <h2>Company documents available for product and compliance review.</h2>
           </div>
           <ShieldCheck size={42} aria-hidden="true" />
         </div>
@@ -356,20 +364,16 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
         </div>
       </section>
 
-      <section className="membership-band reveal" aria-label="Newsletter signup">
+      <section className="membership-band reveal" aria-label="Product inquiry">
         <Sparkles size={26} aria-hidden="true" />
-        <h2>Join the crimson list</h2>
+        <h2>Build a product inquiry</h2>
         <p>
-          Receive new ring and necklace drops, private styling notes, and early
-          access to limited production runs.
+          Add the SKUs you need, enter your contact details, and send the list to the team for follow-up.
         </p>
-        <form className="signup-form">
-          <label htmlFor="email">Email address</label>
-          <div>
-            <input id="email" type="email" placeholder="client@example.com" />
-            <button type="submit">Notify me</button>
-          </div>
-        </form>
+        <div className="membership-actions">
+          <Link className="primary-link" href="/products">Choose products</Link>
+          <Link className="secondary-link" href="/inquiry-cart">Open inquiry cart</Link>
+        </div>
       </section>
     </>
   );
