@@ -428,8 +428,8 @@ img {
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgba(23, 11, 11, 0.88) 0%, rgba(97, 0, 0, 0.64) 42%, rgba(23, 11, 11, 0.18) 100%),
-    linear-gradient(0deg, rgba(23, 11, 11, 0.62), rgba(23, 11, 11, 0.08) 45%, rgba(23, 11, 11, 0.48));
+    linear-gradient(90deg, rgba(23, 11, 11, 0.52) 0%, rgba(97, 0, 0, 0.25) 42%, rgba(23, 11, 11, 0.02) 100%),
+    linear-gradient(0deg, rgba(23, 11, 11, 0.28), rgba(23, 11, 11, 0.02) 45%, rgba(23, 11, 11, 0.12));
   pointer-events: none;
 }
 
@@ -2632,8 +2632,8 @@ img {
 
   .hero-scrim {
     background:
-      linear-gradient(0deg, rgba(23, 11, 11, 0.88) 0%, rgba(97, 0, 0, 0.48) 54%, rgba(23, 11, 11, 0.22) 100%),
-      linear-gradient(90deg, rgba(23, 11, 11, 0.58), rgba(23, 11, 11, 0.08));
+      linear-gradient(0deg, rgba(23, 11, 11, 0.60) 0%, rgba(97, 0, 0, 0.22) 54%, rgba(23, 11, 11, 0.08) 100%),
+      linear-gradient(90deg, rgba(23, 11, 11, 0.28), rgba(23, 11, 11, 0.03));
   }
 
   .hero-slide-image.is-poster {
