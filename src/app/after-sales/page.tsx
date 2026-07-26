@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { PolicyPage } from "@/components/PolicyPage";
 
 export const metadata: Metadata = {
@@ -27,11 +28,45 @@ const sections = [
 
 export default function AfterSalesPage() {
   return (
-    <PolicyPage
-      eyebrow="After-sales service"
-      title="A clear review path after product delivery."
-      intro="After-sales decisions are based on the confirmed SKU, quotation, product specification, and shipping records."
-      sections={sections}
-    />
+    <>
+      <PolicyPage
+        eyebrow="After-sales service"
+        title="A clear review path after product delivery."
+        intro="After-sales decisions are based on the confirmed SKU, quotation, product specification, and shipping records."
+        sections={sections}
+      />
+      <section className="after-sales-evidence page-reveal">
+        <div className="section-heading">
+          <div>
+            <p className="section-kicker">Customer feedback</p>
+            <h2>Recent review highlights from verified purchases.</h2>
+          </div>
+        </div>
+        <div className="after-sales-media-grid">
+          <figure>
+            <Image
+              src="/company/detail-panels/08-customer-reviews-hd.webp"
+              alt="Customer review highlights for Muxcor jewelry orders"
+              width={1074}
+              height={1308}
+              unoptimized
+              sizes="(max-width: 860px) 100vw, 50vw"
+            />
+            <figcaption>Feedback examples supplied by Muxcor from completed marketplace orders.</figcaption>
+          </figure>
+          <figure>
+            <Image
+              src="/company/detail-panels/15-packaging-shipping-hd.webp"
+              alt="Muxcor jewelry packaging, warehouse, and shipping references"
+              width={1072}
+              height={980}
+              unoptimized
+              sizes="(max-width: 860px) 100vw, 50vw"
+            />
+            <figcaption>Packaging and shipment references from the supplied company materials.</figcaption>
+          </figure>
+        </div>
+      </section>
+    </>
   );
 }

@@ -198,7 +198,7 @@ export function ProductListView({
                   Current bag styles are handled through the sourcing team. Send an inquiry
                   and we will return the available catalogue for your market.
                 </p>
-                <a className="primary-link" href="mailto:gary@muxcor.com?subject=Women%27s%20bags%20catalogue%20request">
+                <a className="primary-link" href="mailto:Crescent@muxcor.com?subject=Women%27s%20bags%20catalogue%20request">
                   Contact sourcing team
                 </a>
               </div>

@@ -31,7 +31,7 @@ export default function CertificationsPage() {
           </p>
         </div>
         <div className="cert-hero-document" aria-hidden="true">
-          <Image src="/company/certificates/iso-9001.webp" alt="" fill priority sizes="360px" />
+          <Image src="/company/detail-panels/13-certificate-collection-hd.webp" alt="" fill priority unoptimized sizes="420px" />
         </div>
       </section>
 
@@ -46,6 +46,20 @@ export default function CertificationsPage() {
             </article>
           );
         })}
+      </section>
+
+      <section className="cert-company-evidence page-reveal">
+        <div className="section-heading">
+          <div>
+            <p className="section-kicker">Company and production evidence</p>
+            <h2>Documents supported by a visible production operation.</h2>
+          </div>
+        </div>
+        <div className="cert-evidence-grid">
+          <Image src="/company/detail-panels/09-company-profile-hd.webp" alt="Muxcor company profile" width={1076} height={810} unoptimized sizes="(max-width: 860px) 100vw, 33vw" />
+          <Image src="/company/detail-panels/11-factory-overview-hd.webp" alt="Muxcor factory production overview" width={1070} height={950} unoptimized sizes="(max-width: 860px) 100vw, 33vw" />
+          <Image src="/company/detail-panels/12-process-flow-hd.webp" alt="Jewelry production process flow" width={1076} height={886} unoptimized sizes="(max-width: 860px) 100vw, 33vw" />
+        </div>
       </section>
 
       <section className="certificate-library page-reveal">
@@ -70,7 +84,7 @@ export default function CertificationsPage() {
                     View PDF <ArrowUpRight size={16} />
                   </a>
                 ) : (
-                  <a href={`mailto:gary@muxcor.com?subject=${encodeURIComponent(certificate.title + " document request")}`}>
+                  <a href={`mailto:Crescent@muxcor.com?subject=${encodeURIComponent(certificate.title + " document request")}`}>
                     Request document <FileCheck2 size={16} />
                   </a>
                 )}
@@ -89,7 +103,7 @@ export default function CertificationsPage() {
             SKU so the team can confirm the relevant report, labeling, representative, and packaging requirements.
           </p>
         </div>
-        <a className="primary-link" href="mailto:gary@muxcor.com?subject=Compliance%20document%20request">
+        <a className="primary-link" href="mailto:Crescent@muxcor.com?subject=Compliance%20document%20request">
           Request document review
         </a>
       </section>

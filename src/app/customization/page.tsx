@@ -30,7 +30,7 @@ export default function CustomizationPage() {
             Muxcor supports custom jewelry development from the first brief through design review,
             sampling, production, finishing, packing, and delivery coordination.
           </p>
-          <a className="primary-link" href="mailto:gary@muxcor.com?subject=Custom%20jewelry%20project">
+          <a className="primary-link" href="mailto:Crescent@muxcor.com?subject=Custom%20jewelry%20project">
             Discuss a custom project <ArrowRight size={18} />
           </a>
         </div>
@@ -80,6 +80,33 @@ export default function CustomizationPage() {
         </div>
       </section>
 
+      <section className="customization-panels page-reveal">
+        <div className="section-heading">
+          <div>
+            <p className="section-kicker">Customization reference</p>
+            <h2>Options, materials, and development support at a glance.</h2>
+          </div>
+        </div>
+        <div className="customization-panel-grid">
+          <Image
+            src="/company/detail-panels/01-oem-odm-overview-hd.webp"
+            alt="Muxcor OEM and ODM jewelry overview"
+            width={1078}
+            height={1506}
+            unoptimized
+            sizes="(max-width: 860px) 100vw, 50vw"
+          />
+          <Image
+            src="/company/detail-panels/02-customization-options-hd.webp"
+            alt="Jewelry customization materials and workflow options"
+            width={1080}
+            height={1734}
+            unoptimized
+            sizes="(max-width: 860px) 100vw, 50vw"
+          />
+        </div>
+      </section>
+
       <section className="craft-video-section page-reveal">
         <div className="section-heading">
           <div>
@@ -123,7 +150,7 @@ export default function CustomizationPage() {
             <li><CheckCircle2 size={19} /> Quantity, packing, delivery terms, and documentation</li>
           </ul>
           <div className="company-actions">
-            <a className="primary-link" href="mailto:gary@muxcor.com?subject=Custom%20jewelry%20sample%20request">
+            <a className="primary-link" href="mailto:Crescent@muxcor.com?subject=Custom%20jewelry%20sample%20request">
               Request a sample discussion
             </a>
             <Link className="secondary-link" href="/certifications">
@@ -139,7 +166,7 @@ export default function CustomizationPage() {
           <h2>Bring a sketch, reference, or product direction.</h2>
           <p>The team will review feasibility, sampling needs, quantity, timing, and quotation details.</p>
         </div>
-        <a className="primary-link" href="mailto:gary@muxcor.com?subject=Custom%20jewelry%20inquiry">
+        <a className="primary-link" href="mailto:Crescent@muxcor.com?subject=Custom%20jewelry%20inquiry">
           Email the brief <ArrowRight size={18} />
         </a>
       </section>

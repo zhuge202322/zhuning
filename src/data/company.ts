@@ -1,10 +1,71 @@
 export const companyProfile = {
   name: "Guangzhou Muxcor International Co., Ltd.",
-  address: "No. 179 Yingbin Road, Guangzhou City, Guangdong Province, China",
-  email: "gary@muxcor.com",
+  address: "No. 179 Yingbin Road, Guangzhou City, Guangdong Province, China.",
+  email: "Crescent@muxcor.com",
+  whatsapp: "+86 134 1613 4933",
+  whatsappHref: "https://wa.me/8613416134933",
+  instagram: "https://www.instagram.com/muxcoraccs?igsh=OXR3eHdwbDg1aGNw",
+  facebook: "https://www.facebook.com/share/1SfdmkP2Q2/",
   overview:
     "A Guangzhou fashion jewelry manufacturer supporting catalogue supply, mixed wholesale, OEM and ODM development, sample review, production coordination, and delivery follow-up.",
 };
+
+export type CompanyPanel = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
+export const detailPanelGroups: Array<{
+  id: "product" | "customization" | "company";
+  label: string;
+  title: string;
+  copy: string;
+  necklacesOnly?: boolean;
+  panels: CompanyPanel[];
+}> = [
+  {
+    id: "product",
+    label: "Product details",
+    title: "Pearl necklace details and styling",
+    copy: "Material, construction, wearing, and styling references for the pearl necklace collection.",
+    necklacesOnly: true,
+    panels: [
+      { src: "/company/detail-panels/03-necklace-hero-hd.webp", alt: "Pearl necklace collection overview", width: 1072, height: 1448 },
+      { src: "/company/detail-panels/04-necklace-details-hd.webp", alt: "Pearl necklace construction and material details", width: 1078, height: 1036 },
+      { src: "/company/detail-panels/05-quality-assurance-hd.webp", alt: "Pearl necklace quality assurance", width: 1072, height: 1018 },
+      { src: "/company/detail-panels/06-product-advantages-hd.webp", alt: "Pearl jewelry product advantages", width: 1068, height: 1296 },
+      { src: "/company/detail-panels/07-styling-and-more-products-hd.webp", alt: "Pearl jewelry styling and related product references", width: 1072, height: 1398 },
+    ],
+  },
+  {
+    id: "customization",
+    label: "Customization",
+    title: "OEM and ODM options",
+    copy: "A visual reference for the design, sampling, materials, craftsmanship, production, and delivery workflow.",
+    panels: [
+      { src: "/company/detail-panels/01-oem-odm-overview-hd.webp", alt: "Muxcor OEM and ODM jewelry overview", width: 1078, height: 1506 },
+      { src: "/company/detail-panels/02-customization-options-hd.webp", alt: "Muxcor jewelry customization options", width: 1080, height: 1734 },
+    ],
+  },
+  {
+    id: "company",
+    label: "Factory and trust",
+    title: "Company, production, and delivery evidence",
+    copy: "Customer feedback, company information, factory production, process flow, certificates, service commitments, and shipment references.",
+    panels: [
+      { src: "/company/detail-panels/08-customer-reviews-hd.webp", alt: "Customer review highlights", width: 1074, height: 1308 },
+      { src: "/company/detail-panels/09-company-profile-hd.webp", alt: "Muxcor company profile", width: 1076, height: 810 },
+      { src: "/company/detail-panels/10-about-muxcor-hd.webp", alt: "About Guangzhou Muxcor International", width: 1076, height: 986 },
+      { src: "/company/detail-panels/11-factory-overview-hd.webp", alt: "Muxcor factory and jewelry production teams", width: 1070, height: 950 },
+      { src: "/company/detail-panels/12-process-flow-hd.webp", alt: "Jewelry manufacturing process flow", width: 1076, height: 886 },
+      { src: "/company/detail-panels/13-certificate-collection-hd.webp", alt: "Muxcor certificate collection", width: 1070, height: 636 },
+      { src: "/company/detail-panels/14-service-commitments-hd.webp", alt: "Muxcor product and service commitments", width: 1072, height: 800 },
+      { src: "/company/detail-panels/15-packaging-shipping-hd.webp", alt: "Jewelry packaging and shipping", width: 1072, height: 980 },
+    ],
+  },
+];
 
 export const companyStats = [
   { value: "2007", label: "Company founded" },

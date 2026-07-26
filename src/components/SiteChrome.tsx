@@ -4,17 +4,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import {
+  CircleDollarSign,
+  Camera,
   ChevronRight,
+  CreditCard,
   Heart,
+  Landmark,
+  Mail,
   Menu,
+  MessageCircle,
   Minus,
   Plus,
   Search,
+  Share2,
   ShoppingBag,
   User,
   X,
 } from "lucide-react";
 import { CartProvider, useCart } from "@/components/CartContext";
+import { companyProfile } from "@/data/company";
 import { formatProductPrice } from "@/lib/currency";
 
 const navItems = [
@@ -184,22 +192,53 @@ function Shell({ children }: { children: React.ReactNode }) {
       <main id="main">{children}</main>
 
       <footer className="site-footer">
-        <div>
+        <div className="footer-brand">
           <Link className="brand-mark" href="/" aria-label="Muxcor home">
             <Image className="brand-logo" src="/company/muxcor-logo.png" alt="MUXCOR" width={176} height={64} />
           </Link>
-          <p>
-            Guangzhou Muxcor International Co., Ltd. No. 179 Yingbin Road,
-            Guangzhou City, Guangdong Province, China.
-          </p>
+          <p>{companyProfile.name}</p>
+          <p>{companyProfile.address}</p>
+          <div className="footer-socials" aria-label="Muxcor social media">
+            <a href={companyProfile.instagram} target="_blank" rel="noreferrer" aria-label="Muxcor on Instagram">
+              <Camera size={19} />
+            </a>
+            <a href={companyProfile.facebook} target="_blank" rel="noreferrer" aria-label="Muxcor on Facebook">
+              <Share2 size={19} />
+            </a>
+            <a href={companyProfile.whatsappHref} target="_blank" rel="noreferrer" aria-label="Contact Muxcor on WhatsApp">
+              <MessageCircle size={19} />
+            </a>
+            <a href={`mailto:${companyProfile.email}`} aria-label="Email Muxcor">
+              <Mail size={19} />
+            </a>
+          </div>
         </div>
-        <div className="footer-links">
+        <div className="footer-links footer-column">
+          <strong>Explore</strong>
           <Link href="/about">About us</Link>
           <Link href="/customization">Customization</Link>
           <Link href="/certifications">Certifications</Link>
           <Link href="/after-sales">After-sales</Link>
           <Link href="/policies/privacy">Privacy</Link>
-          <a href="mailto:gary@muxcor.com">gary@muxcor.com</a>
+        </div>
+        <div className="footer-contact footer-column">
+          <strong>Contact</strong>
+          <a href={`mailto:${companyProfile.email}`}><Mail size={17} /> {companyProfile.email}</a>
+          <a href={companyProfile.whatsappHref} target="_blank" rel="noreferrer">
+            <MessageCircle size={17} /> WhatsApp {companyProfile.whatsapp}
+          </a>
+          <a href={companyProfile.instagram} target="_blank" rel="noreferrer"><Camera size={17} /> Instagram</a>
+          <a href={companyProfile.facebook} target="_blank" rel="noreferrer"><Share2 size={17} /> Facebook</a>
+        </div>
+        <div className="footer-payment footer-column">
+          <strong>Payment options</strong>
+          <p>Local currency or USD can be arranged for confirmed quotations.</p>
+          <div className="payment-methods" aria-label="Available payment methods">
+            <span><CreditCard size={17} /> PayPal</span>
+            <span><Landmark size={17} /> Bank transfer</span>
+            <span><CircleDollarSign size={17} /> Alipay</span>
+          </div>
+          <small>Payment method and account details are confirmed with the quotation.</small>
         </div>
       </footer>
 

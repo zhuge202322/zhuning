@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Factory, Gem, Mail, MapPin, PackageCheck, Users } from "lucide-react";
+import { ArrowRight, Camera, Factory, Gem, Mail, MapPin, MessageCircle, PackageCheck, Share2, Users } from "lucide-react";
 import { PageMotion } from "@/components/PageMotion";
 import { companyProfile, companyStats, companyTimeline } from "@/data/company";
 
@@ -18,6 +18,12 @@ const gallery = [
   { src: "/company/production-floor.webp", alt: "Muxcor production floor" },
   { src: "/company/product-display.webp", alt: "Jewelry product display area" },
   { src: "/company/jewelry-studio.webp", alt: "Muxcor jewelry development studio" },
+];
+
+const suppliedCompanyPanels = [
+  { src: "/company/detail-panels/10-about-muxcor-hd.webp", alt: "About Muxcor company overview", width: 1076, height: 986 },
+  { src: "/company/detail-panels/11-factory-overview-hd.webp", alt: "Muxcor factory production overview", width: 1070, height: 950 },
+  { src: "/company/detail-panels/12-process-flow-hd.webp", alt: "Muxcor jewelry production process flow", width: 1076, height: 886 },
 ];
 
 const capabilities = [
@@ -133,6 +139,28 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section className="company-editorial page-reveal">
+        <div className="section-heading">
+          <div>
+            <p className="section-kicker">Company presentation</p>
+            <h2>Factory scale, working teams, and production flow.</h2>
+          </div>
+        </div>
+        <div className="company-editorial-grid">
+          {suppliedCompanyPanels.map((panel) => (
+            <Image
+              src={panel.src}
+              alt={panel.alt}
+              width={panel.width}
+              height={panel.height}
+              unoptimized
+              sizes="(max-width: 860px) 100vw, 33vw"
+              key={panel.src}
+            />
+          ))}
+        </div>
+      </section>
+
       <section className="company-photo-section page-reveal">
         <div className="section-heading">
           <div>
@@ -157,6 +185,9 @@ export default function AboutPage() {
         <div className="company-contact-details">
           <p><MapPin size={20} /> {companyProfile.address}</p>
           <a href={`mailto:${companyProfile.email}`}><Mail size={20} /> {companyProfile.email}</a>
+          <a href={companyProfile.whatsappHref} target="_blank" rel="noreferrer"><MessageCircle size={20} /> WhatsApp {companyProfile.whatsapp}</a>
+          <a href={companyProfile.instagram} target="_blank" rel="noreferrer"><Camera size={20} /> Instagram</a>
+          <a href={companyProfile.facebook} target="_blank" rel="noreferrer"><Share2 size={20} /> Facebook</a>
         </div>
       </section>
     </>

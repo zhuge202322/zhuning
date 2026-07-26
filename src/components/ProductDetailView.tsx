@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, BadgeCheck, Heart, Ruler, ShieldCheck, Sparkles 
 import { useCart } from "@/components/CartContext";
 import { PageMotion } from "@/components/PageMotion";
 import { ProductCard } from "@/components/ProductCard";
+import { detailPanelGroups } from "@/data/company";
 import { formatProductPrice } from "@/lib/currency";
 import type { StoreProduct } from "@/lib/storefront-data";
 
@@ -30,6 +31,9 @@ function ProductGallery({
   const { addToCart, isWishlisted, toggleWishlist } = useCart();
   const [justAdded, setJustAdded] = useState(false);
   const saved = isWishlisted(product.id);
+  const editorialGroups = detailPanelGroups.filter((group) => !group.necklacesOnly || product.category === "Necklaces");
+  const [activeEditorial, setActiveEditorial] = useState(editorialGroups[0].id);
+  const activeEditorialGroup = editorialGroups.find((group) => group.id === activeEditorial) ?? editorialGroups[0];
   const galleryItems = useMemo(
     () =>
       product.images.length
@@ -164,6 +168,53 @@ function ProductGallery({
               gently with a soft cloth. Final packing and shipment details are
               confirmed with the quotation for each SKU.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="product-editorial page-reveal">
+        <div className="section-heading">
+          <div>
+            <p className="section-kicker">Product and production reference</p>
+            <h2>Review the details behind the piece.</h2>
+          </div>
+        </div>
+        <div className="detail-panel-tabs" role="tablist" aria-label="Product detail sections">
+          {editorialGroups.map((group) => (
+            <button
+              className={activeEditorialGroup.id === group.id ? "active" : ""}
+              type="button"
+              role="tab"
+              aria-selected={activeEditorialGroup.id === group.id}
+              aria-controls={`detail-panel-${group.id}`}
+              id={`detail-tab-${group.id}`}
+              onClick={() => setActiveEditorial(group.id)}
+              key={group.id}
+            >
+              {group.label}
+            </button>
+          ))}
+        </div>
+        <div
+          className="detail-editorial-copy"
+          role="tabpanel"
+          id={`detail-panel-${activeEditorialGroup.id}`}
+          aria-labelledby={`detail-tab-${activeEditorialGroup.id}`}
+        >
+          <h3>{activeEditorialGroup.title}</h3>
+          <p>{activeEditorialGroup.copy}</p>
+          <div className="detail-panel-gallery">
+            {activeEditorialGroup.panels.map((panel) => (
+              <Image
+                src={panel.src}
+                alt={panel.alt}
+                width={panel.width}
+                height={panel.height}
+                unoptimized
+                sizes="(max-width: 860px) calc(100vw - 36px), 760px"
+                key={panel.src}
+              />
+            ))}
           </div>
         </div>
       </section>

@@ -17,7 +17,7 @@ export default function WomensBagsPage() {
           <BriefcaseBusiness size={34} />
           <h1>Women&apos;s Bags</h1>
           <p>The online selection is being prepared. Contact the Muxcor team for current styles, materials, colors, and quotation availability.</p>
-          <a className="primary-link" href="mailto:gary@muxcor.com?subject=Women%27s%20bags%20catalogue%20request">
+          <a className="primary-link" href="mailto:Crescent@muxcor.com?subject=Women%27s%20bags%20catalogue%20request">
             Request the current catalogue <ArrowRight size={18} />
           </a>
         </div>
@@ -28,7 +28,7 @@ export default function WomensBagsPage() {
         <p className="section-kicker">Catalogue service</p>
         <h2>Request a tailored bag selection</h2>
         <p>Share your target market, preferred bag types, materials, colors, and quantity range. The sourcing team will reply with available options and quotation details.</p>
-        <a className="secondary-link" href="mailto:gary@muxcor.com?subject=Women%27s%20bags%20sourcing%20request">
+        <a className="secondary-link" href="mailto:Crescent@muxcor.com?subject=Women%27s%20bags%20sourcing%20request">
           Contact the sourcing team
         </a>
       </section>
