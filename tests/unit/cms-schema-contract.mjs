@@ -56,7 +56,7 @@ test("CMS models can be created and read", async () => {
     data: { key: "site.name", value: "Muxcor" },
   });
   const section = await prisma.pageSection.create({
-    data: { pageKey: "home", sectionKey: "hero", title: "Jewelry sourcing" },
+    data: { pageKey: "contract-page", sectionKey: "contract-section", title: "Jewelry sourcing" },
   });
   const media = await prisma.mediaAsset.create({
     data: {
@@ -136,9 +136,33 @@ test("CMS seed is idempotent and does not overwrite administrator edits", async 
     settings: await prisma.siteSetting.count(),
     sections: await prisma.pageSection.count(),
   };
+  const initialHero = await prisma.pageSection.findUnique({
+    where: { pageKey_sectionKey: { pageKey: "home", sectionKey: "hero" } },
+  });
+  assert.equal(initialHero.eyebrow, "Crimson Drop Luxury");
+  assert.equal(initialHero.title, "Jewelry categories, sourced with clarity.");
+  const { slides } = JSON.parse(initialHero.dataJson);
+  assert.equal(slides.length, 3);
+  assert.deepEqual(slides[0], {
+    image: "/products/ruby-oval-pendant-necklace.png",
+    alt: "Ruby oval pendant necklace on a crimson luxury background",
+    kicker: "Crimson Drop Luxury",
+    title: "Jewelry categories, sourced with clarity.",
+    copy: "Browse the supplied catalogue for necklaces, rings, and coordinated jewelry sets, with original SKU titles and prices.",
+    imageMode: "cover",
+  });
   await prisma.siteSetting.update({
     where: { key: "support.email" },
     data: { value: "admin-edited@example.com" },
+  });
+  await prisma.pageSection.update({
+    where: { pageKey_sectionKey: { pageKey: "home", sectionKey: "hero" } },
+    data: {
+      title: "Administrator hero title",
+      body: "Administrator hero body",
+      mediaUrl: "/uploads/administrator-hero.webp",
+      dataJson: JSON.stringify({ source: "administrator" }),
+    },
   });
 
   runSeed();
@@ -156,6 +180,42 @@ test("CMS seed is idempotent and does not overwrite administrator edits", async 
     (await prisma.siteSetting.findUnique({ where: { key: "support.email" } })).value,
     "admin-edited@example.com",
   );
+  const editedHero = await prisma.pageSection.findUnique({
+    where: { pageKey_sectionKey: { pageKey: "home", sectionKey: "hero" } },
+  });
+  assert.deepEqual(
+    {
+      title: editedHero.title,
+      body: editedHero.body,
+      mediaUrl: editedHero.mediaUrl,
+      dataJson: editedHero.dataJson,
+    },
+    {
+      title: "Administrator hero title",
+      body: "Administrator hero body",
+      mediaUrl: "/uploads/administrator-hero.webp",
+      dataJson: JSON.stringify({ source: "administrator" }),
+    },
+  );
   const admin = await prisma.adminUser.findUnique({ where: { username: "contract-admin" } });
   assert.equal(await bcrypt.compare(childEnvironment.ADMIN_PASSWORD, admin.passwordHash), true);
+});
+
+test("CMS seed covers current page structures", async () => {
+  const expectedSections = {
+    home: ["hero", "proof", "categories", "catalogue", "spotlight", "company", "customization", "certifications", "inquiry"],
+    about: ["hero", "stats", "story", "history", "capabilities", "presentation", "gallery", "contact"],
+    customization: ["hero", "brief", "process", "reference", "process-media", "assurance", "contact"],
+    certifications: ["hero", "summary", "evidence", "library", "contact"],
+    "after-sales": ["hero", "commitment", "product-review", "production", "shipping", "resolution", "evidence"],
+    privacy: ["hero", "commitment", "information", "usage", "protection", "choices"],
+    returns: ["hero", "commitment", "window", "exchanges", "exclusions", "refunds"],
+    "product-detail": ["summary", "care", "editorial", "related"],
+  };
+
+  for (const [pageKey, sectionKeys] of Object.entries(expectedSections)) {
+    const rows = await prisma.pageSection.findMany({ where: { pageKey }, orderBy: { sortOrder: "asc" } });
+    assert.deepEqual(rows.map((row) => row.sectionKey), sectionKeys);
+  }
+
 });

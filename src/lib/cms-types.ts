@@ -25,13 +25,13 @@ export const PAGE_KEYS = [
 ] as const;
 
 export const PAGE_SECTION_KEYS = {
-  home: ["hero", "categories", "company", "customization", "certifications", "inquiry"],
-  about: ["hero", "story", "history", "capabilities", "gallery", "contact"],
-  customization: ["hero", "brief", "process", "reference", "assurance", "contact"],
-  certifications: ["hero", "evidence", "library", "contact"],
-  "after-sales": ["hero", "product-review", "production", "shipping", "resolution", "evidence"],
-  privacy: ["hero", "information", "usage", "protection", "choices"],
-  returns: ["hero", "window", "exchanges", "exclusions", "refunds"],
+  home: ["hero", "proof", "categories", "catalogue", "spotlight", "company", "customization", "certifications", "inquiry"],
+  about: ["hero", "stats", "story", "history", "capabilities", "presentation", "gallery", "contact"],
+  customization: ["hero", "brief", "process", "reference", "process-media", "assurance", "contact"],
+  certifications: ["hero", "summary", "evidence", "library", "contact"],
+  "after-sales": ["hero", "commitment", "product-review", "production", "shipping", "resolution", "evidence"],
+  privacy: ["hero", "commitment", "information", "usage", "protection", "choices"],
+  returns: ["hero", "commitment", "window", "exchanges", "exclusions", "refunds"],
   "product-detail": ["summary", "care", "editorial", "related"],
 } as const satisfies Record<(typeof PAGE_KEYS)[number], readonly string[]>;
 
