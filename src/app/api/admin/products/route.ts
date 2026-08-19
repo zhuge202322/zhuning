@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
+import { errorResponse, validateProductInput } from '@/lib/input-validation';
+import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
+import { productImageCreates, productScalarData, productSkuCreates } from '@/lib/catalog-write-data';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const admin = await requireAdmin();
+  if (isAdminResponse(admin)) return admin;
   const products = await prisma.product.findMany({
     orderBy: [{ sortOrder: 'asc' }, { id: 'desc' }],
     include: {
@@ -18,7 +23,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin();
   if (isAdminResponse(admin)) return admin;
-  const body = await req.json();
+  const parsed = await parseJsonObject(req);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data as any;
+  const validation = validateProductInput(body);
+  if (!validation.ok) return errorResponse(validation.error || 'Invalid product data');
   const {
     name, slug, shortDescription, description, images, categoryIds,
     featured, skus,
@@ -29,72 +38,25 @@ export async function POST(req: NextRequest) {
     formula, formulaFr, formulaEs, formulaAr, formulaPdf,
   } = body;
 
-  if (!name || !slug) {
-    return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 });
-  }
-
+  try {
   const product = await prisma.product.create({
     data: {
-      name,
-      slug,
-      shortDescription: shortDescription || '',
-      description: description || '',
-      featured: !!featured,
-      nameFr: nameFr || '',
-      nameEs: nameEs || '',
-      nameAr: nameAr || '',
-      shortDescriptionFr: shortDescriptionFr || '',
-      shortDescriptionEs: shortDescriptionEs || '',
-      shortDescriptionAr: shortDescriptionAr || '',
-      descriptionFr: descriptionFr || '',
-      descriptionEs: descriptionEs || '',
-      descriptionAr: descriptionAr || '',
-      specs: specs || '',
-      specsFr: specsFr || '',
-      specsEs: specsEs || '',
-      specsAr: specsAr || '',
-      specsPdf: specsPdf || null,
-      formula: formula || '',
-      formulaFr: formulaFr || '',
-      formulaEs: formulaEs || '',
-      formulaAr: formulaAr || '',
-      formulaPdf: formulaPdf || null,
+      ...productScalarData(body),
       categories: categoryIds?.length
         ? { connect: categoryIds.map((id: number) => ({ id })) }
         : undefined,
       images: images?.length
-        ? {
-            create: images.map((img: any, i: number) => ({
-              src: img.src,
-              alt: img.alt || '',
-              sortOrder: i,
-            })),
-          }
+        ? { create: productImageCreates(images) }
         : undefined,
       skus: skus?.length
-        ? {
-            create: skus.map((s: any) => ({
-              name: s.name,
-              nameFr: s.nameFr || '',
-              nameEs: s.nameEs || '',
-              nameAr: s.nameAr || '',
-              image: s.images?.length ? (typeof s.images[0] === 'string' ? s.images[0] : s.images[0].src) : (s.image || ''),
-              price: s.price || '',
-              size: s.size || '',
-              images: s.images?.length
-                ? {
-                    create: s.images.map((img: any, idx: number) => ({
-                      src: typeof img === 'string' ? img : img.src,
-                      sortOrder: idx,
-                    })),
-                  }
-                : undefined,
-            })),
-          }
+        ? { create: productSkuCreates(skus) }
         : undefined,
-    },
+    } as any,
     include: { images: true, categories: true, skus: true },
   });
 
   return NextResponse.json(product);
+  } catch (error) {
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

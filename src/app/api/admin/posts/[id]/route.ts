@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
+import { errorResponse, parsePositiveId, validatePostInput } from '@/lib/input-validation';
+import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
+import { postScalarData } from '@/lib/catalog-write-data';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const admin = await requireAdmin();
+  if (isAdminResponse(admin)) return admin;
   const { id } = await ctx.params;
-  const post = await prisma.post.findUnique({ where: { id: Number(id) } });
+  const postId = parsePositiveId(id);
+  if (!postId) return NextResponse.json({ error: 'Invalid post id' }, { status: 400 });
+  const post = await prisma.post.findUnique({ where: { id: postId } });
   if (!post) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(post);
 }
@@ -15,7 +22,13 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   const admin = await requireAdmin();
   if (isAdminResponse(admin)) return admin;
   const { id } = await ctx.params;
-  const body = await req.json();
+  const postId = parsePositiveId(id);
+  if (!postId) return NextResponse.json({ error: 'Invalid post id' }, { status: 400 });
+  const parsed = await parseJsonObject(req);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data as any;
+  const validation = validatePostInput(body, 'update');
+  if (!validation.ok) return errorResponse(validation.error || 'Invalid post data');
   const {
     title, slug, excerpt, content, featuredImage, authorName, date,
     titleFr, titleEs, titleAr,
@@ -23,28 +36,24 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     contentFr, contentEs, contentAr,
   } = body;
 
-  const post = await prisma.post.update({
-    where: { id: Number(id) },
-    data: {
-      title,
-      slug,
-      excerpt: excerpt || '',
-      content: content || '',
-      featuredImage: featuredImage || null,
-      authorName: authorName || 'Myklens Team',
-      date: date ? new Date(date) : undefined,
-      titleFr: titleFr ?? '', titleEs: titleEs ?? '', titleAr: titleAr ?? '',
-      excerptFr: excerptFr ?? '', excerptEs: excerptEs ?? '', excerptAr: excerptAr ?? '',
-      contentFr: contentFr ?? '', contentEs: contentEs ?? '', contentAr: contentAr ?? '',
-    },
-  });
+  try {
+  const post = await prisma.post.update({ where: { id: postId }, data: postScalarData(body) });
   return NextResponse.json(post);
+  } catch (error) {
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin();
   if (isAdminResponse(admin)) return admin;
   const { id } = await ctx.params;
-  await prisma.post.delete({ where: { id: Number(id) } });
-  return NextResponse.json({ ok: true });
+  const postId = parsePositiveId(id);
+  if (!postId) return NextResponse.json({ error: 'Invalid post id' }, { status: 400 });
+  try {
+    await prisma.post.delete({ where: { id: postId } });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

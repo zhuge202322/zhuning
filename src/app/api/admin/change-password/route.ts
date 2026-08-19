@@ -3,17 +3,20 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { destroySession } from '@/lib/auth';
 import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
+import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
 
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin();
   if (isAdminResponse(admin)) return admin;
 
-  const { currentPassword, newPassword } = await req.json();
+  const parsed = await parseJsonObject(req);
+  if (!parsed.ok) return parsed.response;
+  const { currentPassword, newPassword } = parsed.data;
 
-  if (!currentPassword || !newPassword) {
+  if (typeof currentPassword !== 'string' || !currentPassword || typeof newPassword !== 'string' || !newPassword) {
     return NextResponse.json({ error: '请填写完整信息' }, { status: 400 });
   }
-  if (typeof newPassword !== 'string' || newPassword.length < 12) {
+  if (newPassword.length < 12) {
     return NextResponse.json({ error: '新密码至少需要 12 个字符' }, { status: 400 });
   }
   if (!/[A-Za-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
@@ -37,10 +40,15 @@ export async function POST(req: NextRequest) {
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
-  await prisma.adminUser.update({
-    where: { id: user.id },
-    data: { passwordHash },
-  });
+  try {
+    const updatedAt = new Date(Math.max(Date.now(), user.updatedAt.getTime() + 1));
+    await prisma.adminUser.update({
+      where: { id: user.id },
+      data: { passwordHash, updatedAt },
+    });
+  } catch (error) {
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 
   // 让旧 session 失效，强制重新登录
   await destroySession();

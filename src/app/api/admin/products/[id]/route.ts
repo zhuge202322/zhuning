@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
+import { errorResponse, parsePositiveId, validateProductInput } from '@/lib/input-validation';
+import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
+import { productImageCreates, productScalarData, productSkuCreates } from '@/lib/catalog-write-data';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const admin = await requireAdmin();
+  if (isAdminResponse(admin)) return admin;
   const { id } = await ctx.params;
+  const productId = parsePositiveId(id);
+  if (!productId) return NextResponse.json({ error: 'Invalid product id' }, { status: 400 });
   const product = await prisma.product.findUnique({
-    where: { id: Number(id) },
+    where: { id: productId },
     include: {
       images: { orderBy: { sortOrder: 'asc' } },
       categories: true,
@@ -21,8 +28,13 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   const admin = await requireAdmin();
   if (isAdminResponse(admin)) return admin;
   const { id } = await ctx.params;
-  const pid = Number(id);
-  const body = await req.json();
+  const pid = parsePositiveId(id);
+  if (!pid) return NextResponse.json({ error: 'Invalid product id' }, { status: 400 });
+  const parsed = await parseJsonObject(req);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data as any;
+  const validation = validateProductInput(body, 'update');
+  if (!validation.ok) return errorResponse(validation.error || 'Invalid product data');
   const {
     name, slug, shortDescription, description, images, categoryIds,
     featured, skus,
@@ -33,80 +45,45 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     formula, formulaFr, formulaEs, formulaAr, formulaPdf,
   } = body;
 
-  await prisma.productImage.deleteMany({ where: { productId: pid } });
-  await prisma.productSku.deleteMany({ where: { productId: pid } });
+  try {
+  const product = await prisma.$transaction(async (tx) => {
+  if (images !== undefined) await tx.productImage.deleteMany({ where: { productId: pid } });
+  if (skus !== undefined) await tx.productSku.deleteMany({ where: { productId: pid } });
 
-  const product = await prisma.product.update({
+  return tx.product.update({
     where: { id: pid },
     data: {
-      name,
-      slug,
-      shortDescription: shortDescription || '',
-      description: description || '',
-      featured: !!featured,
-      nameFr: nameFr || '',
-      nameEs: nameEs || '',
-      nameAr: nameAr || '',
-      shortDescriptionFr: shortDescriptionFr || '',
-      shortDescriptionEs: shortDescriptionEs || '',
-      shortDescriptionAr: shortDescriptionAr || '',
-      descriptionFr: descriptionFr || '',
-      descriptionEs: descriptionEs || '',
-      descriptionAr: descriptionAr || '',
-      specs: specs || '',
-      specsFr: specsFr || '',
-      specsEs: specsEs || '',
-      specsAr: specsAr || '',
-      specsPdf: specsPdf || null,
-      formula: formula || '',
-      formulaFr: formulaFr || '',
-      formulaEs: formulaEs || '',
-      formulaAr: formulaAr || '',
-      formulaPdf: formulaPdf || null,
-      categories: {
+      ...productScalarData(body),
+      ...(categoryIds !== undefined ? { categories: {
         set: (categoryIds || []).map((cid: number) => ({ id: cid })),
-      },
+      } } : {}),
       images: images?.length
-        ? {
-            create: images.map((img: any, i: number) => ({
-              src: img.src,
-              alt: img.alt || '',
-              sortOrder: i,
-            })),
-          }
+        ? { create: productImageCreates(images) }
         : undefined,
       skus: skus?.length
-        ? {
-            create: skus.map((s: any) => ({
-              name: s.name,
-              nameFr: s.nameFr || '',
-              nameEs: s.nameEs || '',
-              nameAr: s.nameAr || '',
-              image: s.images?.length ? (typeof s.images[0] === 'string' ? s.images[0] : s.images[0].src) : (s.image || ''),
-              price: s.price || '',
-              size: s.size || '',
-              images: s.images?.length
-                ? {
-                    create: s.images.map((img: any, idx: number) => ({
-                      src: typeof img === 'string' ? img : img.src,
-                      sortOrder: idx,
-                    })),
-                  }
-                : undefined,
-            })),
-          }
+        ? { create: productSkuCreates(skus) }
         : undefined,
     },
     include: { images: true, categories: true, skus: true },
   });
+  });
 
   return NextResponse.json(product);
+  } catch (error) {
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin();
   if (isAdminResponse(admin)) return admin;
   const { id } = await ctx.params;
-  await prisma.product.delete({ where: { id: Number(id) } });
-  return NextResponse.json({ ok: true });
+  const productId = parsePositiveId(id);
+  if (!productId) return NextResponse.json({ error: 'Invalid product id' }, { status: 400 });
+  try {
+    await prisma.product.delete({ where: { id: productId } });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

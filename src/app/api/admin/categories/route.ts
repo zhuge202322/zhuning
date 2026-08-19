@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
+import { errorResponse, validateCategoryInput } from '@/lib/input-validation';
+import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
+import { categoryScalarData } from '@/lib/catalog-write-data';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const admin = await requireAdmin();
+  if (isAdminResponse(admin)) return admin;
   const cats = await prisma.category.findMany({
     orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
     include: { _count: { select: { products: true } } },
@@ -15,14 +20,16 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin();
   if (isAdminResponse(admin)) return admin;
-  const body = await req.json();
+  const parsed = await parseJsonObject(req);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data as any;
+  const validation = validateCategoryInput(body);
+  if (!validation.ok) return errorResponse(validation.error || 'Invalid category data');
   const { name, slug, imageUrl, nameFr, nameEs, nameAr } = body;
-  if (!name || !slug) return NextResponse.json({ error: 'Name and slug required' }, { status: 400 });
-  const cat = await prisma.category.create({
-    data: {
-      name, slug, imageUrl: imageUrl || null,
-      nameFr: nameFr || '', nameEs: nameEs || '', nameAr: nameAr || '',
-    },
-  });
-  return NextResponse.json(cat);
+  try {
+    const cat = await prisma.category.create({ data: categoryScalarData(body) as any });
+    return NextResponse.json(cat);
+  } catch (error) {
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

@@ -24,6 +24,7 @@ export default function MediaUploader({ value, onChange, label, kind = 'image' }
       const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
       const uploadId = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
       let uploadedUrl = '';
+      let uploadToken = '';
 
       for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
         const start = chunkIndex * CHUNK_SIZE;
@@ -37,9 +38,13 @@ export default function MediaUploader({ value, onChange, label, kind = 'image' }
           headers: {
             'Content-Type': 'application/octet-stream',
             'x-filename': encodeURIComponent(file.name),
+            'x-mime-type': file.type,
+            'x-file-size': file.size.toString(),
             'x-upload-id': uploadId,
             'x-chunk-index': chunkIndex.toString(),
             'x-chunk-total': totalChunks.toString(),
+            'x-chunk-offset': start.toString(),
+            ...(uploadToken ? { 'x-upload-token': uploadToken } : {}),
           },
           body: chunkBlob,
         });
@@ -51,6 +56,7 @@ export default function MediaUploader({ value, onChange, label, kind = 'image' }
         }
 
         const data = await res.json();
+        if (data.uploadToken) uploadToken = data.uploadToken;
         if (data.url) {
           uploadedUrl = data.url;
         }

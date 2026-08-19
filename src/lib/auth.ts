@@ -12,8 +12,8 @@ function getSecret() {
 const COOKIE = 'myklens_admin';
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
-export async function createSession(payload: { id: number; username: string }) {
-  const token = await new SignJWT(payload)
+export async function createSession(payload: { id: number; username: string; sessionVersion: string }) {
+  const token = await new SignJWT({ ...payload, role: 'admin' })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
@@ -34,7 +34,7 @@ export async function destroySession() {
   c.delete(COOKIE);
 }
 
-export async function getSession(): Promise<{ id: number; username: string } | null> {
+export async function getSession(): Promise<{ id: number; username: string; sessionVersion: string } | null> {
   const c = await cookies();
   const token = c.get(COOKIE)?.value;
   if (!token) return null;
@@ -42,8 +42,9 @@ export async function getSession(): Promise<{ id: number; username: string } | n
     const { payload } = await jwtVerify(token, getSecret());
     const id = Number(payload.id);
     const username = typeof payload.username === "string" ? payload.username : "";
-    if (!Number.isInteger(id) || id <= 0 || !username) return null;
-    return { id, username };
+    const sessionVersion = typeof payload.sessionVersion === "string" ? payload.sessionVersion : "";
+    if (payload.role !== 'admin' || !Number.isInteger(id) || id <= 0 || !username || !sessionVersion) return null;
+    return { id, username, sessionVersion };
   } catch {
     return null;
   }
@@ -55,8 +56,9 @@ export async function getSessionFromToken(token: string | undefined) {
     const { payload } = await jwtVerify(token, getSecret());
     const id = Number(payload.id);
     const username = typeof payload.username === "string" ? payload.username : "";
-    if (!Number.isInteger(id) || id <= 0 || !username) return null;
-    return { id, username };
+    const sessionVersion = typeof payload.sessionVersion === "string" ? payload.sessionVersion : "";
+    if (payload.role !== 'admin' || !Number.isInteger(id) || id <= 0 || !username || !sessionVersion) return null;
+    return { id, username, sessionVersion };
   } catch {
     return null;
   }

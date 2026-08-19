@@ -13,6 +13,8 @@ import {
   LogOut,
   Users,
   ShoppingCart,
+  PanelsTopLeft,
+  Settings,
 } from 'lucide-react';
 
 const NAV = [
@@ -22,6 +24,8 @@ const NAV = [
   { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/admin/customers', label: 'Customers', icon: Users },
   { href: '/admin/categories', label: 'Categories', icon: FolderOpen },
+  { href: '/admin/pages', label: 'Pages', icon: PanelsTopLeft },
+  { href: '/admin/settings', label: 'Site Settings', icon: Settings },
   { href: '/admin/posts', label: 'Posts', icon: FileText },
   { href: '/admin/media', label: 'Site Media', icon: Image },
   { href: '/admin/account', label: 'Account', icon: KeyRound },

@@ -1,10 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 import { pathToFileURL } from "node:url";
-
-process.env.DATABASE_URL ||= "file:./dev.db";
-
-const prisma = new PrismaClient();
 
 export const siteSettingFallbacks = [
   { key: "site.name", value: "Muxcor", type: "text", group: "brand" },
@@ -160,7 +154,7 @@ export const pageSectionFallbacks = sections.map((item) => ({
   ...item,
 }));
 
-async function seedAdmin() {
+async function seedAdmin(prisma, bcrypt) {
   const adminCount = await prisma.adminUser.count();
   if (adminCount > 1) throw new Error("Expected at most one administrator; refusing to seed.");
   if (adminCount === 1) return;
@@ -178,15 +172,25 @@ async function seedAdmin() {
 }
 
 async function main() {
-  await seedAdmin();
-  await prisma.$transaction([
-    ...siteSettingFallbacks.map((setting) => prisma.siteSetting.upsert({ where: { key: setting.key }, update: {}, create: setting })),
-    ...pageSectionFallbacks.map((item) => prisma.pageSection.upsert({
-      where: { pageKey_sectionKey: { pageKey: item.pageKey, sectionKey: item.sectionKey } },
-      update: {},
-      create: item,
-    })),
+  process.env.DATABASE_URL ||= "file:./dev.db";
+  const [{ PrismaClient }, { default: bcrypt }] = await Promise.all([
+    import("@prisma/client"),
+    import("bcryptjs"),
   ]);
+  const prisma = new PrismaClient();
+  try {
+    await seedAdmin(prisma, bcrypt);
+    await prisma.$transaction([
+      ...siteSettingFallbacks.map((setting) => prisma.siteSetting.upsert({ where: { key: setting.key }, update: {}, create: setting })),
+      ...pageSectionFallbacks.map((item) => prisma.pageSection.upsert({
+        where: { pageKey_sectionKey: { pageKey: item.pageKey, sectionKey: item.sectionKey } },
+        update: {},
+        create: item,
+      })),
+    ]);
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -194,6 +198,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     .catch((error) => {
       console.error(error instanceof Error ? error.message : error);
       process.exitCode = 1;
-    })
-    .finally(async () => prisma.$disconnect());
+    });
 }

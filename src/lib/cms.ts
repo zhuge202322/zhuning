@@ -1,6 +1,9 @@
 import { prisma } from './prisma';
 import { formatCategory, formatProduct, formatPost } from './cms-format';
 import { getCurrentLocale } from './locale';
+import { pageSectionFallbacks, siteSettingFallbacks } from '../../scripts/seed-cms.mjs';
+import { normalizePageSections, normalizeSiteSettings } from './cms-readers-core.mjs';
+import { pageSectionRegistry, siteSettingRegistry } from './cms-registry';
 
 export type Locale = 'en' | 'fr' | 'es' | 'ar';
 
@@ -85,4 +88,24 @@ export async function getPostBySlug(slug: string, locale?: Locale) {
   const loc = await resolveLocale(locale);
   const post = await prisma.post.findUnique({ where: { slug } });
   return post ? formatPost(post, loc) : null;
+}
+
+export async function getSiteSettings() {
+  const rows = await prisma.siteSetting.findMany({ orderBy: [{ group: 'asc' }, { key: 'asc' }] });
+  return normalizeSiteSettings(siteSettingFallbacks, siteSettingRegistry, rows);
+}
+
+export async function getSiteSetting(key: string) {
+  return (await getSiteSettings()).find((setting) => setting.key === key) ?? null;
+}
+
+export async function getPageSections(pageKey: string) {
+  const page = pageSectionRegistry[pageKey];
+  if (!page) return [];
+  const rows = await prisma.pageSection.findMany({ where: { pageKey }, orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] });
+  return normalizePageSections(pageKey, pageSectionFallbacks, page, rows);
+}
+
+export async function getPageSection(pageKey: string, sectionKey: string) {
+  return (await getPageSections(pageKey)).find((section) => section.sectionKey === sectionKey) ?? null;
 }

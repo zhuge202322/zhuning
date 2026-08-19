@@ -3,18 +3,19 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { assertSingleSuperAdmin, isSuperAdminSession } from "@/lib/admin-guard-core.mjs";
 
-type AdminRecord = { id: number; username: string };
+type AdminRecord = { id: number; username: string; sessionVersion: string };
 
 export async function getRequiredAdmin(): Promise<AdminRecord | null> {
   const session = await getSession();
   if (!session) return null;
 
   const admins = await prisma.adminUser.findMany({
-    select: { id: true, username: true },
+    select: { id: true, username: true, updatedAt: true },
     orderBy: { id: "asc" },
   });
   assertSingleSuperAdmin(admins);
-  const admin = admins[0] ?? null;
+  const row = admins[0] ?? null;
+  const admin = row ? { id: row.id, username: row.username, sessionVersion: row.updatedAt.toISOString() } : null;
   return isSuperAdminSession(session, admin) ? admin : null;
 }
 

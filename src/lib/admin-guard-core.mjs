@@ -2,11 +2,12 @@ export function isSuperAdminSession(session, admin) {
   return Boolean(
     session &&
       admin &&
-      session.kind !== "customer" &&
+      session.role !== "customer" &&
       Number.isInteger(session.id) &&
       session.id > 0 &&
       session.id === admin.id &&
-      session.username === admin.username,
+      session.username === admin.username &&
+      session.sessionVersion === admin.sessionVersion,
   );
 }
 
