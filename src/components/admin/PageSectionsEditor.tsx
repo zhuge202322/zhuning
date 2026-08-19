@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, CheckCircle2, RefreshCw, Save } from "lucide-react";
+import MediaUploader from "@/components/admin/MediaUploader";
 
 type Section = {
   id: number; pageKey: string; sectionKey: string; eyebrow: string; title: string; body: string;
@@ -93,7 +94,8 @@ export function PageSectionsEditor() {
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {(["eyebrow", "title", "buttonLabel", "buttonHref", "mediaUrl", "mediaAlt"] as const).map((field) => <label key={field}><span className="text-xs font-bold uppercase text-slate-500">{field}</span><input value={section[field]} onChange={(event) => updateSection(index, { [field]: event.target.value })} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /></label>)}
+            {(["eyebrow", "title", "buttonLabel", "buttonHref", "mediaAlt"] as const).map((field) => <label key={field}><span className="text-xs font-bold uppercase text-slate-500">{field}</span><input value={section[field]} onChange={(event) => updateSection(index, { [field]: event.target.value })} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /></label>)}
+            <div className="md:col-span-2"><MediaUploader label="Section media" value={section.mediaUrl} onChange={(url) => updateSection(index, { mediaUrl: url || "" })} kind={section.mediaUrl.toLowerCase().endsWith(".mp4") ? "video" : "image"} /></div>
             <label className="md:col-span-2"><span className="text-xs font-bold uppercase text-slate-500">Body</span><textarea rows={4} value={section.body} onChange={(event) => updateSection(index, { body: event.target.value })} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /></label>
             <label className="md:col-span-2"><span className="text-xs font-bold uppercase text-slate-500">Structured content (JSON)</span><textarea rows={8} spellCheck={false} value={section.dataJson} onChange={(event) => updateSection(index, { dataJson: event.target.value })} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-xs" /></label>
           </div>

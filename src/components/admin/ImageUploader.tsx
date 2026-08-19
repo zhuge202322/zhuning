@@ -1,7 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, FolderOpen } from 'lucide-react';
+import MediaPicker, { type MediaAsset } from './MediaPicker';
+import { uploadMediaAsset } from './uploadMediaAsset';
 
 type Props = {
   value?: string | null;
@@ -12,19 +14,15 @@ type Props = {
 export default function ImageUploader({ value, onChange, label }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   async function upload(file: File) {
     setBusy(true);
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-      if (!res.ok) {
-        alert('Upload failed');
-        return;
-      }
-      const { url } = await res.json();
-      onChange(url);
+      const asset = await uploadMediaAsset(file);
+      onChange(asset.url);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setBusy(false);
     }
@@ -50,6 +48,7 @@ export default function ImageUploader({ value, onChange, label }: Props) {
           >
             <Upload className="w-4 h-4" /> {busy ? 'Uploading...' : 'Upload Image'}
           </button>
+          <button type="button" disabled={busy} onClick={() => setPickerOpen(true)} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"><FolderOpen className="h-4 w-4" /> Choose from library</button>
           {value && (
             <button
               type="button"
@@ -64,7 +63,7 @@ export default function ImageUploader({ value, onChange, label }: Props) {
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/avif"
         className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];
@@ -72,6 +71,7 @@ export default function ImageUploader({ value, onChange, label }: Props) {
           e.target.value = '';
         }}
       />
+      <MediaPicker open={pickerOpen} kind="image" onClose={() => setPickerOpen(false)} onSelect={(asset: MediaAsset) => onChange(asset.url)} />
     </div>
   );
 }

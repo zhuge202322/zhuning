@@ -10,6 +10,7 @@ import {
   Heading1, Heading2, Heading3, Quote, Link as LinkIcon, Image as ImageIcon,
   Undo2, Redo2, Code,
 } from 'lucide-react';
+import { uploadMediaAsset } from './uploadMediaAsset';
 
 type Props = {
   value: string;
@@ -46,15 +47,12 @@ export default function RichEditor({ value, onChange, minHeight = 300 }: Props) 
   }
 
   async function uploadAndInsert(file: File) {
-    const fd = new FormData();
-    fd.append('file', file);
-    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-    if (!res.ok) {
-      alert('Upload failed');
-      return;
+    try {
+      const asset = await uploadMediaAsset(file);
+      editor?.chain().focus().setImage({ src: asset.url, alt: asset.alt }).run();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Upload failed');
     }
-    const { url } = await res.json();
-    editor?.chain().focus().setImage({ src: url }).run();
   }
 
   function pickImage() {

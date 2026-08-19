@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, RefreshCw, Save } from "lucide-react";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 type Setting = { key: string; value: string; label: string; type: string; group: string };
 
@@ -79,15 +80,17 @@ export function SettingsEditor() {
           <h3 className="mb-4 text-sm font-bold uppercase text-slate-700">{group.label}</h3>
           <div className="grid gap-4 md:grid-cols-2">
             {group.settings.map((setting) => (
-              <label key={setting.key} className={setting.type === "textarea" ? "md:col-span-2" : ""}>
+              <div key={setting.key} className={setting.type === "textarea" ? "md:col-span-2" : ""}>
                 <span className="text-sm font-semibold text-slate-700">{setting.label}</span>
                 <span className="ml-2 font-mono text-xs text-slate-400">{setting.key}</span>
-                {setting.type === "textarea" ? (
+                {setting.type === "image" ? (
+                  <div className="mt-2"><ImageUploader value={setting.value} onChange={(value) => setSettings((current) => current.map((item) => item.key === setting.key ? { ...item, value: value || "" } : item))} /></div>
+                ) : setting.type === "textarea" ? (
                   <textarea rows={3} value={setting.value} onChange={(event) => setSettings((current) => current.map((item) => item.key === setting.key ? { ...item, value: event.target.value } : item))} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-primary" />
                 ) : (
                   <input type={setting.type === "email" ? "email" : "text"} value={setting.value} onChange={(event) => setSettings((current) => current.map((item) => item.key === setting.key ? { ...item, value: event.target.value } : item))} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-primary" />
                 )}
-              </label>
+              </div>
             ))}
           </div>
         </section>

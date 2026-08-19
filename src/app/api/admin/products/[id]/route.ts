@@ -4,8 +4,26 @@ import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
 import { errorResponse, parsePositiveId, validateProductInput } from '@/lib/input-validation';
 import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
 import { productImageCreates, productScalarData, productSkuCreates } from '@/lib/catalog-write-data';
+import { assertLocalMediaAssetsExist, MissingMediaAssetError } from '@/lib/media-asset-validation';
 
 export const dynamic = 'force-dynamic';
+
+const IMPORTED_PRODUCT_MEDIA_PREFIX = '/uploads/imported-products/';
+
+function importedProductMediaUrls(product: {
+  images: Array<{ src: string }>;
+  skus: Array<{ image: string; images: Array<{ src: string }> }>;
+  specsPdf: string | null;
+  formulaPdf: string | null;
+}) {
+  const candidates = [
+    ...product.images.map((image) => image.src),
+    ...product.skus.flatMap((sku) => [sku.image, ...sku.images.map((image) => image.src)]),
+    product.specsPdf,
+    product.formulaPdf,
+  ];
+  return candidates.filter((url): url is string => typeof url === 'string' && url.startsWith(IMPORTED_PRODUCT_MEDIA_PREFIX));
+}
 
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin();
@@ -47,6 +65,17 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
 
   try {
   const product = await prisma.$transaction(async (tx) => {
+  const current = await tx.product.findUnique({
+    where: { id: pid },
+    select: {
+      specsPdf: true,
+      formulaPdf: true,
+      images: { select: { src: true } },
+      skus: { select: { image: true, images: { select: { src: true } } } },
+    },
+  });
+  if (!current) return tx.product.update({ where: { id: pid }, data: {} });
+  await assertLocalMediaAssetsExist(tx, body, { allowedLegacyUrls: importedProductMediaUrls(current) });
   if (images !== undefined) await tx.productImage.deleteMany({ where: { productId: pid } });
   if (skus !== undefined) await tx.productSku.deleteMany({ where: { productId: pid } });
 
@@ -70,6 +99,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
 
   return NextResponse.json(product);
   } catch (error) {
+    if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
     return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

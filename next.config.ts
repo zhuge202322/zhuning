@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
     "/*": ["./prisma/dev.db"],
   },
   experimental: {
+    proxyClientMaxBodySize: "200mb",
     serverActions: {
       bodySizeLimit: "100mb",
     },

@@ -4,6 +4,7 @@ import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
 import { errorResponse, parsePositiveId, validatePostInput } from '@/lib/input-validation';
 import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
 import { postScalarData } from '@/lib/catalog-write-data';
+import { assertLocalMediaAssetsExist, MissingMediaAssetError } from '@/lib/media-asset-validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,9 +38,13 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   } = body;
 
   try {
-  const post = await prisma.post.update({ where: { id: postId }, data: postScalarData(body) });
+  const post = await prisma.$transaction(async (tx) => {
+    await assertLocalMediaAssetsExist(tx, body);
+    return tx.post.update({ where: { id: postId }, data: postScalarData(body) });
+  });
   return NextResponse.json(post);
   } catch (error) {
+    if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
     return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -5,6 +5,7 @@ import { errorResponse } from "@/lib/input-validation";
 import { parseJsonObject, prismaErrorResponse } from "@/lib/api-route";
 import { prisma } from "@/lib/prisma";
 import { getPageSections } from "@/lib/cms";
+import { assertLocalMediaAssetsExist, MissingMediaAssetError } from "@/lib/media-asset-validation";
 
 export const dynamic = "force-dynamic";
 
@@ -48,13 +49,17 @@ export async function PUT(req: NextRequest) {
       return { ...result.value, sortOrder: order[index].sortOrder };
     });
     try {
-      await prisma.$transaction(values.map(({ pageKey, sectionKey, ...data }) => prisma.pageSection.upsert({
-        where: { pageKey_sectionKey: { pageKey, sectionKey } },
-        update: data,
-        create: { pageKey, sectionKey, ...data },
-      })));
+      await prisma.$transaction(async (tx) => {
+        await assertLocalMediaAssetsExist(tx, values);
+        await Promise.all(values.map(({ pageKey, sectionKey, ...data }) => tx.pageSection.upsert({
+          where: { pageKey_sectionKey: { pageKey, sectionKey } },
+          update: data,
+          create: { pageKey, sectionKey, ...data },
+        })));
+      });
       return NextResponse.json({ ok: true, sections: await getPageSections(body.pageKey) });
     } catch (error) {
+      if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
       return prismaErrorResponse(error) ?? errorResponse("Internal server error", 500);
     }
   }
@@ -77,13 +82,17 @@ export async function PUT(req: NextRequest) {
   if (!result.ok) return errorResponse(result.error);
   const { pageKey, sectionKey, ...data } = result.value;
   try {
-    const section = await prisma.pageSection.upsert({
-      where: { pageKey_sectionKey: { pageKey, sectionKey } },
-      update: data,
-      create: { ...data, pageKey, sectionKey },
+    const section = await prisma.$transaction(async (tx) => {
+      await assertLocalMediaAssetsExist(tx, result.value);
+      return tx.pageSection.upsert({
+        where: { pageKey_sectionKey: { pageKey, sectionKey } },
+        update: data,
+        create: { ...data, pageKey, sectionKey },
+      });
     });
     return NextResponse.json({ section });
   } catch (error: unknown) {
+    if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
     return prismaErrorResponse(error) ?? errorResponse("Internal server error", 500);
   }
 }

@@ -1,7 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Upload, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Upload, X, ChevronLeft, ChevronRight, FolderOpen } from 'lucide-react';
+import MediaPicker, { type MediaAsset } from './MediaPicker';
+import { uploadMediaAsset } from './uploadMediaAsset';
 
 export type ImageItem = { src: string; alt?: string };
 
@@ -14,20 +16,19 @@ type Props = {
 export default function MultiImageUploader({ value, onChange, label }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   async function uploadFiles(files: FileList) {
     setBusy(true);
     const next = [...value];
     try {
       for (const file of Array.from(files)) {
-        const fd = new FormData();
-        fd.append('file', file);
-        const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-        if (!res.ok) continue;
-        const { url } = await res.json();
-        next.push({ src: url, alt: '' });
+        const asset = await uploadMediaAsset(file);
+        next.push({ src: asset.url, alt: asset.alt });
       }
       onChange(next);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setBusy(false);
     }
@@ -71,12 +72,13 @@ export default function MultiImageUploader({ value, onChange, label }: Props) {
           <Upload className="w-6 h-6" />
           {busy ? 'Uploading...' : 'Add Images'}
         </button>
+        <button type="button" onClick={() => setPickerOpen(true)} className="aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:border-brand-primary hover:text-brand-primary text-sm font-medium gap-2"><FolderOpen className="h-6 w-6" /> Choose from library</button>
       </div>
 
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/avif"
         multiple
         className="hidden"
         onChange={(e) => {
@@ -85,6 +87,7 @@ export default function MultiImageUploader({ value, onChange, label }: Props) {
           e.target.value = '';
         }}
       />
+      <MediaPicker open={pickerOpen} kind="image" onClose={() => setPickerOpen(false)} onSelect={(asset: MediaAsset) => onChange([...value, { src: asset.url, alt: asset.alt }])} />
     </div>
   );
 }

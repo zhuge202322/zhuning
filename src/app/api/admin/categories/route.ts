@@ -4,6 +4,7 @@ import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
 import { errorResponse, validateCategoryInput } from '@/lib/input-validation';
 import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
 import { categoryScalarData } from '@/lib/catalog-write-data';
+import { assertLocalMediaAssetsExist, MissingMediaAssetError } from '@/lib/media-asset-validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,9 +28,13 @@ export async function POST(req: NextRequest) {
   if (!validation.ok) return errorResponse(validation.error || 'Invalid category data');
   const { name, slug, imageUrl, nameFr, nameEs, nameAr } = body;
   try {
-    const cat = await prisma.category.create({ data: categoryScalarData(body) as any });
+    const cat = await prisma.$transaction(async (tx) => {
+      await assertLocalMediaAssetsExist(tx, body);
+      return tx.category.create({ data: categoryScalarData(body) as any });
+    });
     return NextResponse.json(cat);
   } catch (error) {
+    if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
     return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

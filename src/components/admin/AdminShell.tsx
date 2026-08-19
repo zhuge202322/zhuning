@@ -28,6 +28,7 @@ const NAV = [
   { href: '/admin/settings', label: 'Site Settings', icon: Settings },
   { href: '/admin/posts', label: 'Posts', icon: FileText },
   { href: '/admin/media', label: 'Site Media', icon: Image },
+  { href: '/admin/media-library', label: 'Media Library', icon: Image },
   { href: '/admin/account', label: 'Account', icon: KeyRound },
 ];
 
@@ -51,7 +52,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           {NAV.map((item) => {
             const Icon = item.icon;
             const active =
-              item.href === '/admin' ? path === '/admin' : path.startsWith(item.href);
+              item.href === '/admin' ? path === '/admin' : path === item.href || path.startsWith(`${item.href}/`);
             return (
               <Link
                 key={item.href}
@@ -83,7 +84,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <header className="h-16 bg-white border-b border-slate-200 flex items-center px-6">
           <h1 className="text-base font-bold text-slate-800">
             {NAV.find((n) =>
-              n.href === '/admin' ? path === '/admin' : path.startsWith(n.href)
+              n.href === '/admin' ? path === '/admin' : path === n.href || path.startsWith(`${n.href}/`)
             )?.label || 'Admin'}
           </h1>
         </header>

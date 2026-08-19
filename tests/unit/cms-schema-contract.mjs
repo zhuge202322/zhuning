@@ -73,6 +73,7 @@ test("CMS models can be created and read", async () => {
   assert.equal((await prisma.siteSetting.findUnique({ where: { key: setting.key } })).value, "Muxcor");
   assert.equal((await prisma.pageSection.findUnique({ where: { id: section.id } })).dataJson, "{}");
   assert.equal((await prisma.mediaAsset.findUnique({ where: { id: media.id } })).width, 1200);
+  assert.equal((await prisma.mediaAsset.findUnique({ where: { id: media.id } })).status, "ACTIVE");
 });
 
 test("page and section keys are unique as a pair", async () => {

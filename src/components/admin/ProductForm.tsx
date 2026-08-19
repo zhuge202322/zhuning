@@ -7,7 +7,7 @@ import MultiImageUploader, { ImageItem } from './MultiImageUploader';
 import ImageUploader from './ImageUploader';
 import TranslationTabs, { TranslationLocale } from './TranslationTabs';
 import { slugify } from '@/lib/slug';
-import { Save, ArrowLeft, Plus, Trash2, Layers, FileText, Upload, X } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash2, Layers, FileText, X } from 'lucide-react';
 import Link from 'next/link';
 
 type Category = { id: number; name: string };
@@ -411,32 +411,7 @@ export default function ProductForm({ mode, productId, initial, categories }: Pr
         <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide">Specs & Packaging (PDF 附件卡片 - 可选)</label>
           <div className="flex items-center gap-3">
-            <input
-              type="file"
-              accept=".pdf,application/pdf"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                const fd = new FormData();
-                fd.append('file', file);
-                const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-                if (res.ok) {
-                  const { url } = await res.json();
-                  setSpecsPdf(url);
-                } else {
-                  alert('Upload PDF failed');
-                }
-              }}
-              className="hidden"
-              id="specs-pdf-upload"
-            />
-            <button
-              type="button"
-              onClick={() => document.getElementById('specs-pdf-upload')?.click()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
-            >
-              <Upload className="w-3.5 h-3.5" /> 上传 PDF 证书文档
-            </button>
+            <input type="url" value={specsPdf} onChange={(event) => setSpecsPdf(event.target.value)} placeholder="PDF URL" className="min-w-64 flex-1 rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-brand-primary" />
 
             {specsPdf && (
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600">
@@ -465,32 +440,7 @@ export default function ProductForm({ mode, productId, initial, categories }: Pr
         <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide">Formula & MSDS / COA (PDF 附件卡片 - 可选)</label>
           <div className="flex items-center gap-3">
-            <input
-              type="file"
-              accept=".pdf,application/pdf"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                const fd = new FormData();
-                fd.append('file', file);
-                const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-                if (res.ok) {
-                  const { url } = await res.json();
-                  setFormulaPdf(url);
-                } else {
-                  alert('Upload PDF failed');
-                }
-              }}
-              className="hidden"
-              id="formula-pdf-upload"
-            />
-            <button
-              type="button"
-              onClick={() => document.getElementById('formula-pdf-upload')?.click()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
-            >
-              <Upload className="w-3.5 h-3.5" /> 上传 PDF 证书文档
-            </button>
+            <input type="url" value={formulaPdf} onChange={(event) => setFormulaPdf(event.target.value)} placeholder="PDF URL" className="min-w-64 flex-1 rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-brand-primary" />
 
             {formulaPdf && (
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600">

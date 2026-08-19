@@ -58,8 +58,11 @@ model MediaAsset {
   height       Int?
   durationMs   Int?
   alt          String   @default("")
+  status       String   @default("ACTIVE")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([status])
 }
 
 model Category {

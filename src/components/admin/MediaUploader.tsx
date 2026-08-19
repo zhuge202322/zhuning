@@ -1,7 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Upload, X, Image as ImageIcon, Film } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, Film, FolderOpen } from 'lucide-react';
+import MediaPicker, { type MediaAsset } from './MediaPicker';
+import { uploadMediaAsset } from './uploadMediaAsset';
 
 type Props = {
   value?: string | null;
@@ -15,60 +17,16 @@ export default function MediaUploader({ value, onChange, label, kind = 'image' }
   const [busy, setBusy] = useState(false);
 
   const [progressText, setProgressText] = useState('');
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   async function upload(file: File) {
     setBusy(true);
-    setProgressText('Preparing...');
+    setProgressText('Uploading...');
     try {
-      const CHUNK_SIZE = 2 * 1024 * 1024; // 2MB 一个切片，远远低于 10MB 的限制，100% 安全
-      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-      const uploadId = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-      let uploadedUrl = '';
-      let uploadToken = '';
-
-      for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-        const start = chunkIndex * CHUNK_SIZE;
-        const end = Math.min(start + CHUNK_SIZE, file.size);
-        const chunkBlob = file.slice(start, end);
-
-        setProgressText(`Uploading: ${Math.round((chunkIndex / totalChunks) * 100)}% (${chunkIndex + 1}/${totalChunks})`);
-
-        const res = await fetch('/api/admin/upload', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/octet-stream',
-            'x-filename': encodeURIComponent(file.name),
-            'x-mime-type': file.type,
-            'x-file-size': file.size.toString(),
-            'x-upload-id': uploadId,
-            'x-chunk-index': chunkIndex.toString(),
-            'x-chunk-total': totalChunks.toString(),
-            'x-chunk-offset': start.toString(),
-            ...(uploadToken ? { 'x-upload-token': uploadToken } : {}),
-          },
-          body: chunkBlob,
-        });
-
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          alert(`Upload failed at chunk ${chunkIndex + 1}: ${errData.error || res.statusText || 'Unknown error'}`);
-          return;
-        }
-
-        const data = await res.json();
-        if (data.uploadToken) uploadToken = data.uploadToken;
-        if (data.url) {
-          uploadedUrl = data.url;
-        }
-      }
-
-      setProgressText('Success!');
-      if (uploadedUrl) {
-        onChange(uploadedUrl);
-      }
-    } catch (e: any) {
-      console.error(e);
-      alert(`Upload error: ${e.message || 'connection failed'}`);
+      const asset = await uploadMediaAsset(file);
+      onChange(asset.url);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setBusy(false);
       setProgressText('');
@@ -105,6 +63,7 @@ export default function MediaUploader({ value, onChange, label, kind = 'image' }
           >
             <Upload className="w-4 h-4" /> {busy ? (progressText || 'Uploading...') : isVideo ? 'Upload Video' : 'Upload Image'}
           </button>
+          <button type="button" disabled={busy} onClick={() => setPickerOpen(true)} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"><FolderOpen className="h-4 w-4" /> Choose from library</button>
           {value && (
             <button
               type="button"
@@ -119,7 +78,7 @@ export default function MediaUploader({ value, onChange, label, kind = 'image' }
       <input
         ref={inputRef}
         type="file"
-        accept={isVideo ? 'video/*' : 'image/*'}
+        accept={isVideo ? 'video/mp4' : 'image/jpeg,image/png,image/webp,image/avif'}
         className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];
@@ -127,6 +86,7 @@ export default function MediaUploader({ value, onChange, label, kind = 'image' }
           e.target.value = '';
         }}
       />
+      <MediaPicker open={pickerOpen} kind={kind} onClose={() => setPickerOpen(false)} onSelect={(asset: MediaAsset) => onChange(asset.url)} />
     </div>
   );
 }

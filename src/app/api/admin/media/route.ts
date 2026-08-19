@@ -4,6 +4,7 @@ import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
 import { isSafeMediaUrl } from '@/lib/cms-registry';
 import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
 import { errorResponse } from '@/lib/input-validation';
+import { assertLocalMediaAssetsExist, MissingMediaAssetError } from '@/lib/media-asset-validation';
 
 export async function GET() {
   const admin = await requireAdmin();
@@ -39,16 +40,17 @@ export async function PUT(req: NextRequest) {
     validated.push({ key, url: item.url.trim() });
   }
 
-  const existing = await prisma.siteMedia.findMany({ where: { key: { in: [...keys] } }, select: { key: true } });
-  if (existing.length !== validated.length) return errorResponse('Media record not found', 404);
-
   try {
-    await prisma.$transaction(validated.map((item) => prisma.siteMedia.update({
-      where: { key: item.key },
-      data: { url: item.url },
-    })));
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.siteMedia.findMany({ where: { key: { in: [...keys] } }, select: { key: true } });
+      if (existing.length !== validated.length) throw new Error('MEDIA_RECORD_NOT_FOUND');
+      await assertLocalMediaAssetsExist(tx, validated);
+      await Promise.all(validated.map((item) => tx.siteMedia.update({ where: { key: item.key }, data: { url: item.url } })));
+    });
     return NextResponse.json({ ok: true });
   } catch (error) {
+    if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
+    if (error instanceof Error && error.message === 'MEDIA_RECORD_NOT_FOUND') return errorResponse('Media record not found', 404);
     return prismaErrorResponse(error) ?? errorResponse('Internal server error', 500);
   }
 }

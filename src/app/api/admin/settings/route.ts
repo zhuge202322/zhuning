@@ -5,6 +5,7 @@ import { errorResponse } from "@/lib/input-validation";
 import { parseJsonObject, prismaErrorResponse } from "@/lib/api-route";
 import { prisma } from "@/lib/prisma";
 import { getSiteSettings } from "@/lib/cms";
+import { assertLocalMediaAssetsExist, MissingMediaAssetError } from "@/lib/media-asset-validation";
 
 export const dynamic = "force-dynamic";
 
@@ -34,13 +35,17 @@ export async function PUT(req: NextRequest) {
     return result.value;
   });
   try {
-    const settings = await prisma.$transaction(values.map((value) => prisma.siteSetting.upsert({
-      where: { key: value.key },
-      update: { value: value.value, type: value.type, group: value.group },
-      create: value,
-    })));
+    const settings = await prisma.$transaction(async (tx) => {
+      await assertLocalMediaAssetsExist(tx, values);
+      return Promise.all(values.map((value) => tx.siteSetting.upsert({
+        where: { key: value.key },
+        update: { value: value.value, type: value.type, group: value.group },
+        create: value,
+      })));
+    });
     return NextResponse.json({ settings });
   } catch (error) {
+    if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
     return prismaErrorResponse(error) ?? errorResponse("Internal server error", 500);
   }
 }

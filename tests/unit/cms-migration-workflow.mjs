@@ -43,10 +43,14 @@ test("migrate deploy builds the complete CMS schema from zero", () => {
 
   const database = new DatabaseSync(databasePath);
   const tables = database.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((row) => row.name);
+  const mediaStatus = database.prepare("SELECT name, \"notnull\", dflt_value FROM pragma_table_info('MediaAsset') WHERE name = ?").get("status");
+  const mediaStatusIndex = database.prepare("SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'MediaAsset_status_idx'").get();
   database.close();
   for (const table of ["Product", "Category", "Customer", "Order", "SiteSetting", "PageSection", "MediaAsset"]) {
     assert.ok(tables.includes(table), `missing ${table}`);
   }
+  assert.deepEqual({ ...mediaStatus }, { name: "status", notnull: 1, dflt_value: "'ACTIVE'" });
+  assert.ok(mediaStatusIndex);
 });
 
 test("legacy database can be baselined then upgraded without catalog loss", () => {
@@ -86,6 +90,7 @@ test("legacy database can be baselined then upgraded without catalog loss", () =
   const orderTypeColumn = database.prepare("SELECT name, \"notnull\", dflt_value FROM pragma_table_info('Order') WHERE name = ?").get("orderType");
   const foreignKeyErrors = database.prepare('SELECT COUNT(*) AS count FROM pragma_foreign_key_check').get().count;
   const pageSection = database.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'PageSection'").get();
+  const mediaStatus = database.prepare("SELECT dflt_value FROM pragma_table_info('MediaAsset') WHERE name = 'status'").get();
   database.close();
 
   assert.equal(productCount, 1);
@@ -94,4 +99,5 @@ test("legacy database can be baselined then upgraded without catalog loss", () =
   assert.deepEqual({ ...orderTypeColumn }, { name: "orderType", notnull: 1, dflt_value: "'INQUIRY'" });
   assert.equal(foreignKeyErrors, 0);
   assert.ok(pageSection);
+  assert.equal(mediaStatus.dflt_value, "'ACTIVE'");
 });
