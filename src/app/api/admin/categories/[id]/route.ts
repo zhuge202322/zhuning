@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
 
 export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const admin = await requireAdmin();
+  if (isAdminResponse(admin)) return admin;
   const { id } = await ctx.params;
   const body = await req.json();
   const { name, slug, imageUrl, nameFr, nameEs, nameAr } = body;
@@ -20,6 +23,8 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
 }
 
 export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const admin = await requireAdmin();
+  if (isAdminResponse(admin)) return admin;
   const { id } = await ctx.params;
   await prisma.category.delete({ where: { id: Number(id) } });
   return NextResponse.json({ ok: true });

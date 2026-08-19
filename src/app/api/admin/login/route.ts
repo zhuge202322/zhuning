@@ -10,14 +10,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
   }
 
-  const envUsername = process.env.ADMIN_USERNAME;
+  const admins = await prisma.adminUser.findMany({ orderBy: { id: 'asc' } });
+  if (admins.length > 1) {
+    return NextResponse.json({ error: 'Admin account configuration is invalid' }, { status: 500 });
+  }
+
+  const envUsername = process.env.ADMIN_USERNAME?.trim();
   const envPassword = process.env.ADMIN_PASSWORD;
-  if (envUsername && envPassword && username === envUsername && password === envPassword) {
-    await createSession({ id: 0, username: envUsername });
+  if (admins.length === 0 && envUsername && envPassword && username === envUsername && password === envPassword) {
+    const user = await prisma.adminUser.create({
+      data: { username: envUsername, passwordHash: await bcrypt.hash(envPassword, 12) },
+    });
+    await createSession({ id: user.id, username: user.username });
     return NextResponse.json({ ok: true });
   }
 
-  const user = await prisma.adminUser.findUnique({ where: { username } });
+  const user = admins[0];
   if (!user) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 
   const ok = await bcrypt.compare(password, user.passwordHash);

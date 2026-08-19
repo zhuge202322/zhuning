@@ -4,6 +4,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
+import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
 
 export const maxDuration = 300; // 长链接时间增加到 5 分钟支持大视频
 
@@ -12,6 +13,8 @@ const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin();
+  if (isAdminResponse(admin)) return admin;
   try {
     const contentType = req.headers.get('content-type') || '';
     let originalName = 'upload.bin';

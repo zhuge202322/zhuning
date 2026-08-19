@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin();
+  if (isAdminResponse(admin)) return admin;
   const body = await req.json();
   const {
     name, slug, shortDescription, description, images, categoryIds,

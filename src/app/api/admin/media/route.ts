@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { isAdminResponse, requireAdmin } from '@/lib/admin-guard';
 
 export async function GET() {
   const rows = await prisma.siteMedia.findMany({ orderBy: { id: 'asc' } });
@@ -11,6 +12,8 @@ export async function GET() {
  * Body: { items: [{ key: string, url: string }] }
  */
 export async function PUT(req: NextRequest) {
+  const admin = await requireAdmin();
+  if (isAdminResponse(admin)) return admin;
   const body = await req.json();
   const items: { key: string; url: string }[] = Array.isArray(body?.items) ? body.items : [];
 
