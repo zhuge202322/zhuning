@@ -218,4 +218,38 @@ test("CMS seed covers current page structures", async () => {
     assert.deepEqual(rows.map((row) => row.sectionKey), sectionKeys);
   }
 
+  const section = async (pageKey, sectionKey) => prisma.pageSection.findUnique({
+    where: { pageKey_sectionKey: { pageKey, sectionKey } },
+  });
+  const aboutStory = await section("about", "story");
+  assert.match(aboutStory.body, /fashion jewelry since 2007/);
+  const aboutHistory = JSON.parse((await section("about", "history")).dataJson).timeline;
+  assert.equal(aboutHistory.length, 3);
+  assert.equal(aboutHistory[1].copy, "Dedicated production operations expanded support for sampling, manufacturing, and quality follow-up.");
+  const capabilities = JSON.parse((await section("about", "capabilities")).dataJson).capabilities;
+  assert.equal(capabilities.length, 4);
+  assert.equal(capabilities[0].title, "Broad jewelry range");
+  assert.match(capabilities[3].copy, /Packing, documentation/);
+
+  const processSteps = JSON.parse((await section("customization", "process")).dataJson).steps;
+  assert.equal(processSteps.length, 5);
+  assert.equal(processSteps[4].title, "Packing and delivery");
+  const referencePanels = JSON.parse((await section("customization", "reference")).dataJson).panels;
+  assert.equal(referencePanels.length, 2);
+  assert.equal(referencePanels[0].width, 1078);
+  const assurance = JSON.parse((await section("customization", "assurance")).dataJson).checklist;
+  assert.equal(assurance.length, 4);
+  assert.match(assurance[2], /Sample appearance/);
+
+  const certificationSummary = JSON.parse((await section("certifications", "summary")).dataJson).areas;
+  assert.equal(certificationSummary.length, 4);
+  assert.match(certificationSummary[2].copy, /REACH/);
+  const certificateLibrary = JSON.parse((await section("certifications", "library")).dataJson).certificates;
+  assert.equal(certificateLibrary.length, 10);
+  assert.equal(certificateLibrary[0].title, "ISO 9001 Quality Management");
+  const afterSalesMedia = JSON.parse((await section("after-sales", "evidence")).dataJson).media;
+  assert.equal(afterSalesMedia.length, 2);
+  assert.match(afterSalesMedia[1].caption, /Packaging and shipment/);
+  assert.match((await section("product-detail", "care")).body, /Keep the piece dry/);
+
 });

@@ -157,11 +157,11 @@ CREATE TABLE "OrderItem" (
 
 CREATE TABLE "SiteMedia" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "key" TEXT NOT NULL,
+    "key" TEXT NOT NULL UNIQUE,
     "url" TEXT NOT NULL DEFAULT '',
     "label" TEXT NOT NULL DEFAULT '',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "PageView" (
@@ -193,6 +193,5 @@ CREATE UNIQUE INDEX "Product_slug_key" ON "Product"("slug");
 CREATE UNIQUE INDEX "Post_slug_key" ON "Post"("slug");
 CREATE UNIQUE INDEX "Customer_email_key" ON "Customer"("email");
 CREATE UNIQUE INDEX "Order_orderNumber_key" ON "Order"("orderNumber");
-CREATE UNIQUE INDEX "SiteMedia_key_key" ON "SiteMedia"("key");
 CREATE UNIQUE INDEX "_ProductCategories_AB_unique" ON "_ProductCategories"("A", "B");
 CREATE INDEX "_ProductCategories_B_index" ON "_ProductCategories"("B");

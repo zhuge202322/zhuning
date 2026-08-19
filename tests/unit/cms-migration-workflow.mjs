@@ -50,12 +50,21 @@ test("migrate deploy builds the complete CMS schema from zero", () => {
 });
 
 test("legacy database can be baselined then upgraded without catalog loss", () => {
-  assert.ok(readFileSync(baselineSqlPath, "utf8").includes('CREATE TABLE "Product"'));
+  const baselineSql = readFileSync(baselineSqlPath, "utf8");
+  assert.ok(baselineSql.includes('CREATE TABLE "Product"'));
+  assert.match(baselineSql, /"key" TEXT NOT NULL UNIQUE/);
+  assert.match(baselineSql, /"updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP/);
+  assert.doesNotMatch(baselineSql, /SiteMedia_key_key/);
   const sourcePath = path.join(temporaryDirectory, "legacy-source.db");
   const databasePath = path.join(temporaryDirectory, "legacy-copy.db");
   createEmptyDatabase(sourcePath);
   const source = new DatabaseSync(sourcePath);
   source.exec(readFileSync(baselineSqlPath, "utf8"));
+  const siteMediaTable = source.prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'SiteMedia'").get().sql;
+  const siteMediaIndexes = source.prepare("SELECT name, sql FROM sqlite_master WHERE type = 'index' AND tbl_name = 'SiteMedia'").all();
+  assert.match(siteMediaTable, /"key" TEXT NOT NULL UNIQUE/);
+  assert.match(siteMediaTable, /"updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP/);
+  assert.deepEqual(siteMediaIndexes.map((index) => ({ ...index })), [{ name: "sqlite_autoindex_SiteMedia_1", sql: null }]);
   source.exec(`
     INSERT INTO "Category" ("name", "slug", "createdAt", "updatedAt")
     VALUES ('Legacy Necklaces', 'legacy-necklaces', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
