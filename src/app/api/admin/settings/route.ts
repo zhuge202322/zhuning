@@ -46,7 +46,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ settings });
   } catch (error) {
     if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
-    return prismaErrorResponse(error) ?? errorResponse("Internal server error", 500);
+    return prismaErrorResponse(error) ?? errorResponse("服务器内部错误", 500);
   }
 }
 

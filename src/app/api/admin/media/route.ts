@@ -51,6 +51,6 @@ export async function PUT(req: NextRequest) {
   } catch (error) {
     if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
     if (error instanceof Error && error.message === 'MEDIA_RECORD_NOT_FOUND') return errorResponse('Media record not found', 404);
-    return prismaErrorResponse(error) ?? errorResponse('Internal server error', 500);
+    return prismaErrorResponse(error) ?? errorResponse('服务器内部错误', 500);
   }
 }

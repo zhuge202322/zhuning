@@ -8,24 +8,24 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 const RANGES: { v: Range; label: string }[] = [
-  { v: 1, label: 'Today' },
-  { v: 7, label: '7 days' },
-  { v: 30, label: '30 days' },
-  { v: 90, label: '90 days' },
+  { v: 1, label: '今天' },
+  { v: 7, label: '近 7 天' },
+  { v: 30, label: '近 30 天' },
+  { v: 90, label: '近 90 天' },
 ];
 
 const SOURCE_LABEL: Record<string, string> = {
-  google_ads: 'Google Ads',
-  facebook_ads: 'Facebook Ads',
-  google: 'Google (organic)',
+  google_ads: 'Google 广告',
+  facebook_ads: 'Facebook 广告',
+  google: 'Google（自然搜索）',
   facebook: 'Facebook',
   bing: 'Bing',
   instagram: 'Instagram',
   youtube: 'YouTube',
   tiktok: 'TikTok',
   twitter: 'Twitter / X',
-  referral: 'Referral',
-  direct: 'Direct',
+  referral: '引荐访问',
+  direct: '直接访问',
 };
 const SOURCE_COLOR: Record<string, string> = {
   google_ads: 'bg-blue-500',
@@ -34,6 +34,11 @@ const SOURCE_COLOR: Record<string, string> = {
   facebook: 'bg-violet-500',
   direct: 'bg-slate-400',
   referral: 'bg-amber-500',
+};
+const DEVICE_LABEL: Record<string, string> = {
+  mobile: '手机',
+  tablet: '平板电脑',
+  desktop: '电脑',
 };
 
 export default async function AdminAnalyticsPage({
@@ -63,8 +68,8 @@ export default async function AdminAnalyticsPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-extrabold text-slate-800">Analytics</h2>
-          <p className="text-sm text-slate-500">Visitor traffic insights from the last {rangeValue} day(s).</p>
+          <h2 className="text-2xl font-extrabold text-slate-800">数据分析</h2>
+          <p className="text-sm text-slate-500">查看近 {rangeValue} 天的网站访问数据。</p>
         </div>
         <div className="inline-flex bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
           {RANGES.map((r) => (
@@ -82,20 +87,20 @@ export default async function AdminAnalyticsPage({
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Page Views" value={overview.pv} icon={Eye} color="bg-blue-500" />
-        <StatCard label="Unique Visitors" value={overview.uv} icon={Users} color="bg-emerald-500" />
+        <StatCard label="页面浏览量" value={overview.pv} icon={Eye} color="bg-blue-500" />
+        <StatCard label="独立访客" value={overview.uv} icon={Users} color="bg-emerald-500" />
         <StatCard
-          label="Google Landing PV"
+          label="Google 落地页浏览量"
           value={googleLp.pv}
-          subtitle={`${googleLp.uv} unique`}
+          subtitle={`${googleLp.uv} 位独立访客`}
           icon={Megaphone}
           color="bg-sky-500"
           href="/landing"
         />
         <StatCard
-          label="Facebook Landing PV"
+          label="Facebook 落地页浏览量"
           value={fbLp.pv}
-          subtitle={`${fbLp.uv} unique`}
+          subtitle={`${fbLp.uv} 位独立访客`}
           icon={Megaphone}
           color="bg-violet-500"
           href="/facebook-landing"
@@ -103,7 +108,7 @@ export default async function AdminAnalyticsPage({
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 p-6">
-        <h3 className="text-sm font-bold text-slate-700 mb-4">Daily traffic</h3>
+        <h3 className="text-sm font-bold text-slate-700 mb-4">每日访问趋势</h3>
         <div className="h-48 flex items-end gap-1">
           {trend.map((t) => {
             const h = (t.pv / maxTrend) * 100;
@@ -131,9 +136,9 @@ export default async function AdminAnalyticsPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h3 className="text-sm font-bold text-slate-700 mb-4">Top pages</h3>
+          <h3 className="text-sm font-bold text-slate-700 mb-4">热门页面</h3>
           <div className="space-y-2">
-            {topPages.length === 0 && <p className="text-sm text-slate-400">No data yet.</p>}
+            {topPages.length === 0 && <p className="text-sm text-slate-400">暂无数据。</p>}
             {topPages.map((p) => {
               const max = topPages[0].count;
               const pct = (p.count / max) * 100;
@@ -155,9 +160,9 @@ export default async function AdminAnalyticsPage({
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h3 className="text-sm font-bold text-slate-700 mb-4">Traffic sources</h3>
+          <h3 className="text-sm font-bold text-slate-700 mb-4">访问来源</h3>
           <div className="space-y-3">
-            {sources.length === 0 && <p className="text-sm text-slate-400">No data yet.</p>}
+            {sources.length === 0 && <p className="text-sm text-slate-400">暂无数据。</p>}
             {sources.map((s) => {
               const pct = ((s.count / totalSourceCount) * 100).toFixed(1);
               const color = SOURCE_COLOR[s.source] || 'bg-slate-400';
@@ -180,13 +185,13 @@ export default async function AdminAnalyticsPage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:col-span-1">
           <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-            <Smartphone className="w-4 h-4" /> Devices
+            <Smartphone className="w-4 h-4" /> 设备分布
           </h3>
           <div className="space-y-2 text-sm">
-            {devices.length === 0 && <p className="text-slate-400">No data yet.</p>}
+            {devices.length === 0 && <p className="text-slate-400">暂无数据。</p>}
             {devices.map((d) => (
               <div key={d.device} className="flex justify-between border-b border-slate-100 pb-2 last:border-0">
-                <span className="text-slate-600 capitalize">{d.device}</span>
+                <span className="text-slate-600">{DEVICE_LABEL[d.device] || d.device}</span>
                 <span className="font-bold text-slate-800">{d.count}</span>
               </div>
             ))}
@@ -194,28 +199,28 @@ export default async function AdminAnalyticsPage({
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:col-span-2">
-          <h3 className="text-sm font-bold text-slate-700 mb-4">Recent visits</h3>
+          <h3 className="text-sm font-bold text-slate-700 mb-4">最近访问</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-left text-xs text-slate-500 uppercase">
                 <tr>
-                  <th className="py-2 pr-4">When</th>
-                  <th className="py-2 pr-4">Path</th>
-                  <th className="py-2 pr-4">Source</th>
-                  <th className="py-2 pr-4">Device</th>
-                  <th className="py-2">Campaign</th>
+                  <th className="py-2 pr-4">时间</th>
+                  <th className="py-2 pr-4">页面路径</th>
+                  <th className="py-2 pr-4">来源</th>
+                  <th className="py-2 pr-4">设备</th>
+                  <th className="py-2">推广活动</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {recent.length === 0 && (
-                  <tr><td colSpan={5} className="py-4 text-center text-slate-400">No visits yet.</td></tr>
+                  <tr><td colSpan={5} className="py-4 text-center text-slate-400">暂无访问记录。</td></tr>
                 )}
                 {recent.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50">
                     <td className="py-2 pr-4 text-slate-500 whitespace-nowrap">{new Date(r.createdAt).toLocaleString()}</td>
                     <td className="py-2 pr-4 font-mono text-xs text-slate-700">{r.path}</td>
                     <td className="py-2 pr-4 text-slate-600">{SOURCE_LABEL[r.source] || r.source}</td>
-                    <td className="py-2 pr-4 text-slate-600 capitalize">{r.device || '-'}</td>
+                    <td className="py-2 pr-4 text-slate-600">{r.device ? (DEVICE_LABEL[r.device] || r.device) : '-'}</td>
                     <td className="py-2 text-slate-500 text-xs">{r.utmCampaign || '-'}</td>
                   </tr>
                 ))}

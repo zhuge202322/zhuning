@@ -14,7 +14,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-6">Edit Post</h2>
+      <h2 className="text-xl font-bold text-slate-800 mb-6">编辑文章</h2>
       <PostForm
         mode="edit"
         postId={post.id}

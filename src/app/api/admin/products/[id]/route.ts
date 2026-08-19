@@ -100,7 +100,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   return NextResponse.json(product);
   } catch (error) {
     if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
-    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: '服务器内部错误' }, { status: 500 });
   }
 }
 
@@ -114,6 +114,6 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
     await prisma.product.delete({ where: { id: productId } });
     return NextResponse.json({ ok: true });
   } catch (error) {
-    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: '服务器内部错误' }, { status: 500 });
   }
 }

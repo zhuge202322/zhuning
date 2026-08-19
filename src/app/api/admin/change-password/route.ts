@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       data: { passwordHash, updatedAt },
     });
   } catch (error) {
-    return prismaErrorResponse(error) ?? NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return prismaErrorResponse(error) ?? NextResponse.json({ error: '服务器内部错误' }, { status: 500 });
   }
 
   // 让旧 session 失效，强制重新登录

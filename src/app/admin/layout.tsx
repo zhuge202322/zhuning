@@ -10,7 +10,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: 'Myklens CMS — Admin',
+  title: 'Myklens 管理后台',
 };
 
 export default async function AdminLayout({
@@ -27,7 +27,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <html lang="en" translate="no" className={`${plusJakartaSans.variable} font-sans antialiased`}>
+    <html lang="zh-CN" translate="no" className={`${plusJakartaSans.variable} font-sans antialiased`}>
       <body className="bg-slate-50 text-slate-800 min-h-screen">
         {isLogin ? children : <AdminShell>{children}</AdminShell>}
       </body>

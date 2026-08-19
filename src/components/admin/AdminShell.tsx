@@ -18,18 +18,18 @@ import {
 } from 'lucide-react';
 
 const NAV = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/admin/products', label: 'Products', icon: Package },
-  { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
-  { href: '/admin/customers', label: 'Customers', icon: Users },
-  { href: '/admin/categories', label: 'Categories', icon: FolderOpen },
-  { href: '/admin/pages', label: 'Pages', icon: PanelsTopLeft },
-  { href: '/admin/settings', label: 'Site Settings', icon: Settings },
-  { href: '/admin/posts', label: 'Posts', icon: FileText },
-  { href: '/admin/media', label: 'Site Media', icon: Image },
-  { href: '/admin/media-library', label: 'Media Library', icon: Image },
-  { href: '/admin/account', label: 'Account', icon: KeyRound },
+  { href: '/admin', label: '仪表盘', icon: LayoutDashboard },
+  { href: '/admin/analytics', label: '数据分析', icon: BarChart3 },
+  { href: '/admin/products', label: '产品管理', icon: Package },
+  { href: '/admin/orders', label: '订单管理', icon: ShoppingCart },
+  { href: '/admin/customers', label: '客户管理', icon: Users },
+  { href: '/admin/categories', label: '产品类目', icon: FolderOpen },
+  { href: '/admin/pages', label: '页面板块', icon: PanelsTopLeft },
+  { href: '/admin/settings', label: '网站设置', icon: Settings },
+  { href: '/admin/posts', label: '文章管理', icon: FileText },
+  { href: '/admin/media', label: '网站媒体', icon: Image },
+  { href: '/admin/media-library', label: '媒体库', icon: Image },
+  { href: '/admin/account', label: '账号安全', icon: KeyRound },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
@@ -46,7 +46,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen flex bg-slate-50">
       <aside className="w-64 shrink-0 bg-slate-900 text-slate-100 flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-slate-800">
-          <span className="text-lg font-extrabold">Myklens CMS</span>
+          <span className="text-lg font-extrabold">Myklens 管理后台</span>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {NAV.map((item) => {
@@ -75,7 +75,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
           >
             <LogOut className="w-4 h-4" />
-            Logout
+            退出登录
           </button>
         </div>
       </aside>
@@ -85,7 +85,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           <h1 className="text-base font-bold text-slate-800">
             {NAV.find((n) =>
               n.href === '/admin' ? path === '/admin' : path === n.href || path.startsWith(`${n.href}/`)
-            )?.label || 'Admin'}
+            )?.label || '管理后台'}
           </h1>
         </header>
         <main className="flex-1 p-6 overflow-y-auto">{children}</main>

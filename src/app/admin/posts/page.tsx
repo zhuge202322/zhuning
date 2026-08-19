@@ -11,9 +11,9 @@ export default async function AdminPostsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-slate-800">Posts ({posts.length})</h2>
+        <h2 className="text-xl font-bold text-slate-800">文章（{posts.length}）</h2>
         <Link href="/admin/posts/new" className="inline-flex items-center gap-2 bg-brand-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:opacity-90 transition">
-          <Plus className="w-4 h-4" /> New Post
+          <Plus className="w-4 h-4" /> 新建文章
         </Link>
       </div>
 
@@ -21,11 +21,11 @@ export default async function AdminPostsPage() {
         <table className="w-full">
           <thead className="bg-slate-50 text-left text-xs font-bold text-slate-500 uppercase tracking-wide">
             <tr>
-              <th className="px-4 py-3">Cover</th>
-              <th className="px-4 py-3">Title</th>
-              <th className="px-4 py-3">Slug</th>
-              <th className="px-4 py-3">Date</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className="px-4 py-3">封面</th>
+              <th className="px-4 py-3">标题</th>
+              <th className="px-4 py-3">别名</th>
+              <th className="px-4 py-3">日期</th>
+              <th className="px-4 py-3 text-right">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-sm">
@@ -43,14 +43,14 @@ export default async function AdminPostsPage() {
                 <td className="px-4 py-3 text-slate-600">{p.date.toISOString().slice(0, 10)}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex gap-2">
-                    <Link href={`/admin/posts/${p.id}`} className="text-brand-primary font-bold hover:underline">Edit</Link>
+                    <Link href={`/admin/posts/${p.id}`} className="text-brand-primary font-bold hover:underline">编辑</Link>
                     <PostDeleteButton id={p.id} title={p.title.replace(/<[^>]*>/g, '')} />
                   </div>
                 </td>
               </tr>
             ))}
             {posts.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-slate-400">No posts yet.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-8 text-center text-slate-400">暂无文章。</td></tr>
             )}
           </tbody>
         </table>

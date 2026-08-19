@@ -176,16 +176,16 @@ export function validatePageSectionInput(input) {
   const value = { pageKey: input.pageKey, sectionKey: input.sectionKey };
   if (input.dataJson !== undefined) {
     let dataJson = input.dataJson;
-    if (dataJson.length > 500000) return { ok: false, error: "Structured content is too large" };
+    if (dataJson.length > 500000) return { ok: false, error: "结构化内容过大" };
     try {
       const parsed = JSON.parse(dataJson);
       if (!parsed || Array.isArray(parsed) || typeof parsed !== "object") throw new Error("object required");
-      if (Object.keys(parsed).some((key) => !allowedDataKeys.includes(key))) return { ok: false, error: "Structured content contains unknown fields" };
-      if (!hasValidSectionDataShape(input.pageKey, input.sectionKey, parsed)) return { ok: false, error: "Structured content has an invalid shape" };
-      if (!hasSafeNestedUrls(parsed)) return { ok: false, error: "Structured content contains an invalid URL" };
+      if (Object.keys(parsed).some((key) => !allowedDataKeys.includes(key))) return { ok: false, error: "结构化内容包含未知字段" };
+      if (!hasValidSectionDataShape(input.pageKey, input.sectionKey, parsed)) return { ok: false, error: "结构化内容格式无效" };
+      if (!hasSafeNestedUrls(parsed)) return { ok: false, error: "结构化内容包含无效地址" };
       value.dataJson = JSON.stringify(parsed);
     } catch {
-      return { ok: false, error: "Structured content must be a JSON object" };
+      return { ok: false, error: "结构化内容必须是 JSON 对象" };
     }
   }
   for (const field of ["eyebrow", "title", "body", "buttonLabel", "buttonHref", "mediaUrl", "mediaAlt", "sortOrder", "enabled"]) {

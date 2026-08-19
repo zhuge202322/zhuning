@@ -24,11 +24,11 @@ export default function MediaManagerPage() {
     setError('');
     try {
       const res = await fetch('/api/admin/media');
-      if (!res.ok) throw new Error('Failed to load site media items');
+      if (!res.ok) throw new Error('网站媒体加载失败');
       const data = await res.json();
       setItems(data);
     } catch (err: any) {
-      setError(err.message || 'Error loading media settings');
+      setError(err.message || '媒体设置加载失败');
     } finally {
       setLoading(false);
     }
@@ -54,11 +54,11 @@ export default function MediaManagerPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items }),
       });
-      if (!res.ok) throw new Error('Failed to save settings');
+      if (!res.ok) throw new Error('媒体设置保存失败');
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
-      setError(err.message || 'Failed to save settings');
+      setError(err.message || '媒体设置保存失败');
     } finally {
       setSaving(false);
     }
@@ -67,7 +67,7 @@ export default function MediaManagerPage() {
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-slate-500 font-medium py-12">
-        <RefreshCw className="w-5 h-5 animate-spin" /> Loading settings...
+        <RefreshCw className="w-5 h-5 animate-spin" /> 设置加载中...
       </div>
     );
   }
@@ -87,7 +87,7 @@ export default function MediaManagerPage() {
     <div className="max-w-4xl space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-800">网站全局配置中心 (Media & Settings)</h2>
+          <h2 className="text-xl font-extrabold text-slate-800">网站媒体与全局配置</h2>
           <p className="text-xs text-slate-500 mt-1">
             在这里可以统一管理网站所有的本地媒体文件（Logo、背景、视频）以及邮箱、电话、WhatsApp和社交媒体等全局业务信息。
           </p>
@@ -115,8 +115,8 @@ export default function MediaManagerPage() {
 
       <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
         <div>
-          <h3 className="text-sm font-extrabold text-slate-800">1. 页脚 & 联系页全局业务信息 (Contact & Social Links)</h3>
-          <p className="text-xs text-slate-400 mt-0.5">管理员在这里修改后，页脚（Footer）和 Contact 联络页面的相关信息会实时更新。</p>
+          <h3 className="text-sm font-extrabold text-slate-800">1. 页脚与联系页业务信息</h3>
+          <p className="text-xs text-slate-400 mt-0.5">修改后，页脚和联系页面中的相关信息会实时更新。</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {configItems.map((item) => (
@@ -139,7 +139,7 @@ export default function MediaManagerPage() {
 
       <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
         <div>
-          <h3 className="text-sm font-extrabold text-slate-800">2. 网站多媒体资源管理 (Media Banners)</h3>
+          <h3 className="text-sm font-extrabold text-slate-800">2. 网站多媒体资源</h3>
           <p className="text-xs text-slate-400 mt-0.5">替换网站大背景图、轮播主图和公司视频。</p>
         </div>
         <div className="divide-y divide-slate-100 border border-slate-100 rounded-xl overflow-hidden bg-white">

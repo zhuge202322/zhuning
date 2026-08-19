@@ -15,7 +15,7 @@ export async function uploadMediaAsset(file: File, alt = ""): Promise<MediaAsset
       })
     : await fetch("/api/admin/media/assets", { method: "POST", body: mediaForm(file, alt) });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok || !data.asset?.url) throw new Error(data.error || `Failed to upload ${file.name}`);
+  if (!response.ok || !data.asset?.url) throw new Error(data.error || `上传文件失败：${file.name}`);
   return data.asset;
 }
 
@@ -43,6 +43,6 @@ export async function replaceMediaAsset(asset: MediaAsset, file: File): Promise<
       })
     : await fetch(`/api/admin/media/assets/${asset.id}`, { method: "PUT", body: mediaForm(file, asset.alt, asset.updatedAt) });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok || !data.asset?.url) throw new Error(data.error || `Failed to replace ${asset.originalName}`);
+  if (!response.ok || !data.asset?.url) throw new Error(data.error || `替换文件失败：${asset.originalName}`);
   return data;
 }

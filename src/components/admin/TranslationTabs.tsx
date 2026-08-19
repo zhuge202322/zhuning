@@ -6,13 +6,13 @@ import { Languages } from 'lucide-react';
 export type TranslationLocale = 'fr' | 'es' | 'ar';
 
 const LOCALE_META: Record<TranslationLocale, { label: string; flag: string }> = {
-  fr: { label: 'Français', flag: '🇫🇷' },
-  es: { label: 'Español',  flag: '🇪🇸' },
-  ar: { label: 'العربية',  flag: '🇸🇦' },
+  fr: { label: '法语', flag: '🇫🇷' },
+  es: { label: '西班牙语', flag: '🇪🇸' },
+  ar: { label: '阿拉伯语', flag: '🇸🇦' },
 };
 
 export default function TranslationTabs({
-  title = 'Translations',
+  title = '多语言翻译',
   children,
 }: {
   title?: string;

@@ -23,13 +23,13 @@ export default function AdminLoginPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Login failed');
+        setError(data.error || '登录失败');
         return;
       }
       router.push('/admin');
       router.refresh();
     } catch (err: any) {
-      setError(err.message || 'Network error');
+      setError(err.message || '网络错误');
     } finally {
       setLoading(false);
     }
@@ -45,8 +45,8 @@ export default function AdminLoginPage() {
           <div className="w-14 h-14 rounded-2xl bg-brand-primary/10 flex items-center justify-center mb-4">
             <Lock className="w-7 h-7 text-brand-primary" />
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-800">Admin Login</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage products & articles</p>
+          <h1 className="text-2xl font-extrabold text-slate-800">后台登录</h1>
+          <p className="text-sm text-slate-500 mt-1">管理产品、订单和网站内容</p>
         </div>
 
         {error && (
@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
         )}
 
         <label className="block mb-4">
-          <span className="text-sm font-bold text-slate-700">Username</span>
+          <span className="text-sm font-bold text-slate-700">管理员账号</span>
           <input
             type="text"
             value={username}
@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
         </label>
 
         <label className="block mb-6">
-          <span className="text-sm font-bold text-slate-700">Password</span>
+          <span className="text-sm font-bold text-slate-700">管理员密码</span>
           <input
             type="password"
             value={password}
@@ -84,7 +84,7 @@ export default function AdminLoginPage() {
           className="w-full flex items-center justify-center gap-2 bg-brand-primary text-white font-bold py-3 rounded-xl shadow hover:opacity-90 disabled:opacity-50 transition"
         >
           <LogIn className="w-4 h-4" />
-          {loading ? 'Signing in...' : 'Sign In'}
+          {loading ? '登录中...' : '登录'}
         </button>
       </form>
     </div>

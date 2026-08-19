@@ -60,7 +60,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ ok: true, sections: await getPageSections(body.pageKey) });
     } catch (error) {
       if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
-      return prismaErrorResponse(error) ?? errorResponse("Internal server error", 500);
+      return prismaErrorResponse(error) ?? errorResponse("服务器内部错误", 500);
     }
   }
 
@@ -93,7 +93,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ section });
   } catch (error: unknown) {
     if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
-    return prismaErrorResponse(error) ?? errorResponse("Internal server error", 500);
+      return prismaErrorResponse(error) ?? errorResponse("服务器内部错误", 500);
   }
 }
 

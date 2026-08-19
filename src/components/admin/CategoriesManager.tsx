@@ -36,7 +36,7 @@ export default function CategoriesManager({ initial }: { initial: Cat[] }) {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        alert(err.error || 'Create failed');
+        alert(err.error || '类目创建失败');
         return;
       }
       setAdding(false);
@@ -51,13 +51,13 @@ export default function CategoriesManager({ initial }: { initial: Cat[] }) {
     <div className="space-y-6">
       <div className="bg-white rounded-2xl border border-slate-200">
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h3 className="font-bold text-slate-800">All Categories ({initial.length})</h3>
+        <h3 className="font-bold text-slate-800">全部类目（{initial.length}）</h3>
           {!adding && (
             <button
               onClick={() => setAdding(true)}
               className="inline-flex items-center gap-2 bg-brand-primary text-white px-4 py-2 rounded-xl text-sm font-bold hover:opacity-90"
             >
-              <Plus className="w-4 h-4" /> New Category
+              <Plus className="w-4 h-4" /> 新建类目
             </button>
           )}
         </div>
@@ -65,10 +65,10 @@ export default function CategoriesManager({ initial }: { initial: Cat[] }) {
         {adding && (
           <form onSubmit={createCat} className="px-6 py-4 border-b border-slate-100 bg-slate-50 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <ImageUploader value={newImage} onChange={setNewImage} label="Category image" />
+              <ImageUploader value={newImage} onChange={setNewImage} label="类目图片" />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Name</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">类目名称</label>
               <input
                 required
                 value={newName}
@@ -77,7 +77,7 @@ export default function CategoriesManager({ initial }: { initial: Cat[] }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Slug</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">类目别名</label>
               <input
                 required
                 value={newSlug}
@@ -87,10 +87,10 @@ export default function CategoriesManager({ initial }: { initial: Cat[] }) {
             </div>
             <div className="md:col-span-2 flex gap-2">
               <button type="submit" disabled={busy} className="inline-flex items-center gap-2 bg-brand-primary text-white px-4 py-2 rounded-xl text-sm font-bold hover:opacity-90 disabled:opacity-50">
-                <Save className="w-4 h-4" /> {busy ? 'Saving...' : 'Save'}
+                <Save className="w-4 h-4" /> {busy ? '保存中...' : '保存'}
               </button>
               <button type="button" onClick={() => { setAdding(false); setNewName(''); setNewSlug(''); setNewImage(null); }} className="inline-flex items-center gap-2 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-100">
-                <X className="w-4 h-4" /> Cancel
+                <X className="w-4 h-4" /> 取消
               </button>
             </div>
           </form>
@@ -101,7 +101,7 @@ export default function CategoriesManager({ initial }: { initial: Cat[] }) {
             <CategoryRow key={c.id} cat={c} />
           ))}
           {initial.length === 0 && (
-            <div className="px-6 py-8 text-center text-slate-400">No categories yet.</div>
+            <div className="px-6 py-8 text-center text-slate-400">暂无产品类目。</div>
           )}
         </div>
       </div>
@@ -129,7 +129,7 @@ function CategoryRow({ cat }: { cat: Cat }) {
         body: JSON.stringify({ name, slug, imageUrl, nameFr, nameEs, nameAr }),
       });
       if (!res.ok) {
-        alert('Save failed');
+        alert('保存失败');
         return;
       }
       setEditing(false);
@@ -140,11 +140,11 @@ function CategoryRow({ cat }: { cat: Cat }) {
   }
 
   async function remove() {
-    if (!confirm(`Delete category "${cat.name}"? Products will be unlinked.`)) return;
+    if (!confirm(`确定删除类目“${cat.name}”吗？产品将解除该类目关联。`)) return;
     setBusy(true);
     try {
       const res = await fetch(`/api/admin/categories/${cat.id}`, { method: 'DELETE' });
-      if (!res.ok) { alert('Delete failed'); return; }
+      if (!res.ok) { alert('删除失败'); return; }
       router.refresh();
     } finally {
       setBusy(false);
@@ -155,34 +155,34 @@ function CategoryRow({ cat }: { cat: Cat }) {
     return (
       <div className="px-6 py-4 bg-amber-50/50 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">
-          <ImageUploader value={imageUrl} onChange={setImageUrl} label="Category image" />
+          <ImageUploader value={imageUrl} onChange={setImageUrl} label="类目图片" />
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-500 mb-1">Name</label>
+          <label className="block text-xs font-bold text-slate-500 mb-1">类目名称</label>
           <input value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-primary" />
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-500 mb-1">Slug</label>
+          <label className="block text-xs font-bold text-slate-500 mb-1">类目别名</label>
           <input value={slug} onChange={(e) => setSlug(e.target.value)} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-primary font-mono" />
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-500 mb-1">Name (FR) 🇫🇷</label>
-          <input value={nameFr} onChange={(e) => setNameFr(e.target.value)} placeholder="— falls back to English" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-primary" />
+          <label className="block text-xs font-bold text-slate-500 mb-1">名称（法语）🇫🇷</label>
+          <input value={nameFr} onChange={(e) => setNameFr(e.target.value)} placeholder="留空时使用英文默认名称" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-primary" />
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-500 mb-1">Name (ES) 🇪🇸</label>
-          <input value={nameEs} onChange={(e) => setNameEs(e.target.value)} placeholder="— falls back to English" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-primary" />
+          <label className="block text-xs font-bold text-slate-500 mb-1">名称（西班牙语）🇪🇸</label>
+          <input value={nameEs} onChange={(e) => setNameEs(e.target.value)} placeholder="留空时使用英文默认名称" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-primary" />
         </div>
         <div className="md:col-span-2">
-          <label className="block text-xs font-bold text-slate-500 mb-1">Name (AR) 🇸🇦</label>
-          <input value={nameAr} dir="rtl" onChange={(e) => setNameAr(e.target.value)} placeholder="— falls back to English" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-primary" />
+          <label className="block text-xs font-bold text-slate-500 mb-1">名称（阿拉伯语）🇸🇦</label>
+          <input value={nameAr} dir="rtl" onChange={(e) => setNameAr(e.target.value)} placeholder="留空时使用英文默认名称" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-primary" />
         </div>
         <div className="md:col-span-2 flex gap-2">
           <button onClick={save} disabled={busy} className="inline-flex items-center gap-2 bg-brand-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90 disabled:opacity-50">
-            <Save className="w-4 h-4" /> {busy ? 'Saving...' : 'Save'}
+            <Save className="w-4 h-4" /> {busy ? '保存中...' : '保存'}
           </button>
           <button onClick={() => { setEditing(false); setName(cat.name); setSlug(cat.slug); setImageUrl(cat.imageUrl); setNameFr(cat.nameFr); setNameEs(cat.nameEs); setNameAr(cat.nameAr); }} className="inline-flex items-center gap-2 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-100">
-            <X className="w-4 h-4" /> Cancel
+            <X className="w-4 h-4" /> 取消
           </button>
         </div>
       </div>
@@ -199,12 +199,12 @@ function CategoryRow({ cat }: { cat: Cat }) {
         <div className="text-xs text-slate-500 font-mono">{cat.slug}</div>
       </div>
       <div className="text-xs font-bold text-slate-500 px-2 py-1 rounded-full bg-slate-100">
-        {cat.productCount} products
+        {cat.productCount} 个产品
       </div>
       <div className="flex gap-2">
-        <button onClick={() => setEditing(true)} className="text-brand-primary font-bold text-sm hover:underline">Edit</button>
+        <button onClick={() => setEditing(true)} className="text-brand-primary font-bold text-sm hover:underline">编辑</button>
         <button onClick={remove} disabled={busy} className="inline-flex items-center text-rose-600 font-bold text-sm hover:underline disabled:opacity-50">
-          <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
+          <Trash2 className="w-3.5 h-3.5 mr-1" /> 删除
         </button>
       </div>
     </div>

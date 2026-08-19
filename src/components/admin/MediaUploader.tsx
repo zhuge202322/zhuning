@@ -21,12 +21,12 @@ export default function MediaUploader({ value, onChange, label, kind = 'image' }
 
   async function upload(file: File) {
     setBusy(true);
-    setProgressText('Uploading...');
+    setProgressText('上传中...');
     try {
       const asset = await uploadMediaAsset(file);
       onChange(asset.url);
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Upload failed');
+      alert(error instanceof Error ? error.message : '上传失败');
     } finally {
       setBusy(false);
       setProgressText('');
@@ -61,16 +61,16 @@ export default function MediaUploader({ value, onChange, label, kind = 'image' }
             onClick={() => inputRef.current?.click()}
             className="inline-flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 disabled:opacity-50"
           >
-            <Upload className="w-4 h-4" /> {busy ? (progressText || 'Uploading...') : isVideo ? 'Upload Video' : 'Upload Image'}
+            <Upload className="w-4 h-4" /> {busy ? (progressText || '上传中...') : isVideo ? '上传视频' : '上传图片'}
           </button>
-          <button type="button" disabled={busy} onClick={() => setPickerOpen(true)} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"><FolderOpen className="h-4 w-4" /> Choose from library</button>
+          <button type="button" disabled={busy} onClick={() => setPickerOpen(true)} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"><FolderOpen className="h-4 w-4" /> 从媒体库选择</button>
           {value && (
             <button
               type="button"
               onClick={() => onChange(null)}
               className="inline-flex items-center gap-2 text-rose-600 text-sm font-medium hover:underline"
             >
-              <X className="w-4 h-4" /> Remove
+              <X className="w-4 h-4" /> 移除
             </button>
           )}
         </div>

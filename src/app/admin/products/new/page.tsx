@@ -11,7 +11,7 @@ export default async function NewProductPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-6">New Product</h2>
+      <h2 className="text-xl font-bold text-slate-800 mb-6">新建产品</h2>
       <ProductForm mode="create" categories={categories} />
     </div>
   );

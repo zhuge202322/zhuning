@@ -28,7 +28,7 @@ export default function MultiImageUploader({ value, onChange, label }: Props) {
       }
       onChange(next);
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Upload failed');
+      alert(error instanceof Error ? error.message : '上传失败');
     } finally {
       setBusy(false);
     }
@@ -55,11 +55,11 @@ export default function MultiImageUploader({ value, onChange, label }: Props) {
           <div key={i} className="relative group bg-slate-50 rounded-xl overflow-hidden border border-slate-200 aspect-square">
             <img src={img.src} alt={img.alt || ''} className="w-full h-full object-cover" />
             <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-              <button type="button" onClick={() => move(i, -1)} className="w-7 h-7 bg-white/90 rounded-md flex items-center justify-center" title="Move left"><ChevronLeft className="w-4 h-4" /></button>
-              <button type="button" onClick={() => move(i, 1)} className="w-7 h-7 bg-white/90 rounded-md flex items-center justify-center" title="Move right"><ChevronRight className="w-4 h-4" /></button>
-              <button type="button" onClick={() => remove(i)} className="w-7 h-7 bg-rose-600 text-white rounded-md flex items-center justify-center" title="Remove"><X className="w-4 h-4" /></button>
+              <button type="button" onClick={() => move(i, -1)} className="w-7 h-7 bg-white/90 rounded-md flex items-center justify-center" title="左移"><ChevronLeft className="w-4 h-4" /></button>
+              <button type="button" onClick={() => move(i, 1)} className="w-7 h-7 bg-white/90 rounded-md flex items-center justify-center" title="右移"><ChevronRight className="w-4 h-4" /></button>
+              <button type="button" onClick={() => remove(i)} className="w-7 h-7 bg-rose-600 text-white rounded-md flex items-center justify-center" title="移除"><X className="w-4 h-4" /></button>
             </div>
-            {i === 0 && <span className="absolute top-2 left-2 bg-brand-primary text-white text-xs font-bold px-2 py-0.5 rounded">Main</span>}
+            {i === 0 && <span className="absolute top-2 left-2 bg-brand-primary text-white text-xs font-bold px-2 py-0.5 rounded">主图</span>}
           </div>
         ))}
 
@@ -70,9 +70,9 @@ export default function MultiImageUploader({ value, onChange, label }: Props) {
           className="aspect-square border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-500 hover:border-brand-primary hover:text-brand-primary text-sm font-medium gap-2 disabled:opacity-50"
         >
           <Upload className="w-6 h-6" />
-          {busy ? 'Uploading...' : 'Add Images'}
+          {busy ? '上传中...' : '添加图片'}
         </button>
-        <button type="button" onClick={() => setPickerOpen(true)} className="aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:border-brand-primary hover:text-brand-primary text-sm font-medium gap-2"><FolderOpen className="h-6 w-6" /> Choose from library</button>
+        <button type="button" onClick={() => setPickerOpen(true)} className="aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:border-brand-primary hover:text-brand-primary text-sm font-medium gap-2"><FolderOpen className="h-6 w-6" /> 从媒体库选择</button>
       </div>
 
       <input

@@ -11,7 +11,7 @@ export default async function AdminCategoriesPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-6">Categories</h2>
+      <h2 className="text-xl font-bold text-slate-800 mb-6">产品类目</h2>
       <CategoriesManager
         initial={cats.map((c: any) => ({
           id: c.id,

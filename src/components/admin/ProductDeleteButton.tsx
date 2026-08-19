@@ -8,12 +8,12 @@ export default function ProductDeleteButton({ id, name }: { id: number; name: st
   const [busy, setBusy] = useState(false);
 
   async function onClick() {
-    if (!confirm(`Delete product "${name}"?`)) return;
+    if (!confirm(`确定删除产品“${name}”吗？`)) return;
     setBusy(true);
     try {
       const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
       if (!res.ok) {
-        alert('Delete failed');
+        alert('删除失败');
         return;
       }
       router.refresh();
@@ -24,7 +24,7 @@ export default function ProductDeleteButton({ id, name }: { id: number; name: st
 
   return (
     <button onClick={onClick} disabled={busy} className="text-rose-600 font-bold hover:underline disabled:opacity-50">
-      {busy ? 'Deleting...' : 'Delete'}
+      {busy ? '删除中...' : '删除'}
     </button>
   );
 }

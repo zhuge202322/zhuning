@@ -14,17 +14,17 @@ export default async function AdminDashboard() {
   ]);
 
   const cards = [
-    { label: 'Products', value: productCount, href: '/admin/products', icon: Package, color: 'bg-blue-500' },
-    { label: 'Orders', value: orderCount, href: '/admin/orders', icon: ShoppingCart, color: 'bg-rose-500' },
-    { label: 'Customers', value: customerCount, href: '/admin/customers', icon: Users, color: 'bg-violet-500' },
-    { label: 'Categories', value: categoryCount, href: '/admin/categories', icon: FolderOpen, color: 'bg-emerald-500' },
-    { label: 'Posts', value: postCount, href: '/admin/posts', icon: FileText, color: 'bg-amber-500' },
+    { label: '产品', value: productCount, href: '/admin/products', icon: Package, color: 'bg-blue-500' },
+    { label: '订单', value: orderCount, href: '/admin/orders', icon: ShoppingCart, color: 'bg-rose-500' },
+    { label: '客户', value: customerCount, href: '/admin/customers', icon: Users, color: 'bg-violet-500' },
+    { label: '产品类目', value: categoryCount, href: '/admin/categories', icon: FolderOpen, color: 'bg-emerald-500' },
+    { label: '文章', value: postCount, href: '/admin/posts', icon: FileText, color: 'bg-amber-500' },
   ];
 
   return (
     <div className="max-w-5xl">
-      <h2 className="text-2xl font-extrabold text-slate-800 mb-2">Welcome back</h2>
-      <p className="text-slate-500 mb-8">Quick overview of your content.</p>
+      <h2 className="text-2xl font-extrabold text-slate-800 mb-2">欢迎回来</h2>
+      <p className="text-slate-500 mb-8">快速查看网站内容和业务数据。</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {cards.map((c) => {

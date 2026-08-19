@@ -8,6 +8,7 @@ import RichEditor from './RichEditor';
 import ImageUploader from './ImageUploader';
 import TranslationTabs, { TranslationLocale } from './TranslationTabs';
 import { slugify } from '@/lib/slug';
+import { LOCALE_LABEL } from './admin-labels';
 
 type LocaleStrings = Record<TranslationLocale, string>;
 const EMPTY_LOCALE: LocaleStrings = { fr: '', es: '', ar: '' };
@@ -76,7 +77,7 @@ export default function PostForm({ mode, postId, initial }: Props) {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        setError(err.error || 'Save failed');
+        setError(err.error || '文章保存失败');
         return;
       }
       router.push('/admin/posts');
@@ -90,10 +91,10 @@ export default function PostForm({ mode, postId, initial }: Props) {
     <form onSubmit={onSubmit} className="max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <Link href="/admin/posts" className="inline-flex items-center gap-2 text-slate-600 font-medium hover:text-slate-800">
-          <ArrowLeft className="w-4 h-4" /> Back
+          <ArrowLeft className="w-4 h-4" /> 返回
         </Link>
         <button type="submit" disabled={busy} className="inline-flex items-center gap-2 bg-brand-primary text-white px-5 py-2.5 rounded-xl font-bold shadow hover:opacity-90 disabled:opacity-50">
-          <Save className="w-4 h-4" /> {busy ? 'Saving...' : mode === 'create' ? 'Create' : 'Update'}
+          <Save className="w-4 h-4" /> {busy ? '保存中...' : mode === 'create' ? '创建文章' : '更新文章'}
         </button>
       </div>
 
@@ -102,7 +103,7 @@ export default function PostForm({ mode, postId, initial }: Props) {
       <div className="bg-white rounded-2xl border border-slate-200 p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2 space-y-4">
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Title *</label>
+            <label className="block text-sm font-bold text-slate-700 mb-2">标题 *</label>
             <input
               required
               value={title}
@@ -111,56 +112,56 @@ export default function PostForm({ mode, postId, initial }: Props) {
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Slug *</label>
+            <label className="block text-sm font-bold text-slate-700 mb-2">文章别名 *</label>
             <input
               required
               value={slug}
               onChange={(e) => { setSlug(e.target.value); setSlugTouched(true); }}
               className="w-full rounded-xl border border-slate-200 px-4 py-2.5 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 font-mono text-sm"
             />
-            <p className="text-xs text-slate-500 mt-1">URL: /news/{slug || '...'}</p>
+            <p className="text-xs text-slate-500 mt-1">文章链接：/news/{slug || '...'}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Author</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">作者</label>
               <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} className="w-full rounded-xl border border-slate-200 px-4 py-2.5 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20" />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Date</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">日期</label>
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full rounded-xl border border-slate-200 px-4 py-2.5 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20" />
             </div>
           </div>
         </div>
         <div>
-          <ImageUploader value={featuredImage} onChange={setFeaturedImage} label="Featured image" />
+          <ImageUploader value={featuredImage} onChange={setFeaturedImage} label="文章封面" />
         </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 p-6">
-        <h3 className="text-sm font-bold text-slate-700 mb-3">Excerpt</h3>
+        <h3 className="text-sm font-bold text-slate-700 mb-3">摘要</h3>
         <RichEditor value={excerpt} onChange={setExcerpt} minHeight={120} />
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 p-6">
-        <h3 className="text-sm font-bold text-slate-700 mb-3">Content</h3>
+        <h3 className="text-sm font-bold text-slate-700 mb-3">正文内容</h3>
         <RichEditor value={content} onChange={setContent} minHeight={500} />
       </div>
 
-      <TranslationTabs title="Translations (Post)">
+      <TranslationTabs title="文章多语言翻译">
         {(locale, isRtl) => (
           <>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Title ({locale})</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">标题（{LOCALE_LABEL[locale]}）</label>
               <input
                 value={titleI18n[locale]}
                 onChange={(e) => setLocale(setTitleI18n, titleI18n)(locale, e.target.value)}
-                placeholder="Leave empty to fall back to English"
+                placeholder="留空时使用英文默认内容"
                 className="w-full rounded-xl border border-slate-200 px-4 py-2.5 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
                 dir={isRtl ? 'rtl' : 'ltr'}
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Excerpt ({locale})</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">摘要（{LOCALE_LABEL[locale]}）</label>
               <RichEditor
                 key={`excerpt-${locale}`}
                 value={excerptI18n[locale]}
@@ -169,7 +170,7 @@ export default function PostForm({ mode, postId, initial }: Props) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Content ({locale})</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">正文（{LOCALE_LABEL[locale]}）</label>
               <RichEditor
                 key={`content-${locale}`}
                 value={contentI18n[locale]}
