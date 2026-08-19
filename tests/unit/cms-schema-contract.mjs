@@ -226,6 +226,53 @@ test("CMS seed covers current page structures", async () => {
   const aboutHistory = JSON.parse((await section("about", "history")).dataJson).timeline;
   assert.equal(aboutHistory.length, 3);
   assert.equal(aboutHistory[1].copy, "Dedicated production operations expanded support for sampling, manufacturing, and quality follow-up.");
+  const homeCategories = JSON.parse((await section("home", "categories")).dataJson).cards;
+  assert.deepEqual(homeCategories, [
+    {
+      label: "Necklaces",
+      title: "Liquid Pearl Lines",
+      body: "Layered pearl chains, gold finishes, and crystal light for formal wardrobes.",
+      linkLabel: "Explore necklaces",
+      href: "/products?category=necklaces",
+    },
+    {
+      label: "Rings",
+      title: "Obsidian Statement",
+      body: "Sculpted bands, oversized gemstones, and red-black accents for confident styling.",
+      linkLabel: "Explore rings",
+      href: "/products?category=rings",
+    },
+    {
+      label: "Jewelry sets",
+      title: "Coordinated Sets",
+      body: "Matching necklace, earring, ring, and bracelet combinations from the supplied catalogue.",
+      linkLabel: "Explore jewelry sets",
+      href: "/products?category=jewelry-sets",
+    },
+  ]);
+  const aboutPresentation = JSON.parse((await section("about", "presentation")).dataJson).panels;
+  assert.deepEqual(aboutPresentation.map(({ src, alt, width, height }) => ({ src, alt, width, height })), [
+    { src: "/company/detail-panels/10-about-muxcor-hd.webp", alt: "About Muxcor company overview", width: 1076, height: 986 },
+    { src: "/company/detail-panels/11-factory-overview-hd.webp", alt: "Muxcor factory production overview", width: 1070, height: 950 },
+    { src: "/company/detail-panels/12-process-flow-hd.webp", alt: "Muxcor jewelry production process flow", width: 1076, height: 886 },
+  ]);
+  const customizationHero = await section("customization", "hero");
+  assert.equal(customizationHero.body, "Muxcor supports custom jewelry development from the first brief through design review, sampling, production, finishing, packing, and delivery coordination.");
+  assert.equal(customizationHero.buttonLabel, "Discuss a custom project");
+  assert.equal(customizationHero.buttonHref, "mailto:Crescent@muxcor.com?subject=Custom%20jewelry%20project");
+  const customizationBrief = JSON.parse((await section("customization", "brief")).dataJson).items;
+  assert.deepEqual(customizationBrief.map(({ title, copy }) => ({ title, copy })), [
+    { title: "Reference and brief", copy: "Sketches, reference images, dimensions, target price, market, and expected quantity." },
+    { title: "Materials and stones", copy: "Base metal, plating color, stones, pearls, finish, and wear requirements." },
+    { title: "Brand direction", copy: "Logo use, color direction, collection language, and packaging preferences." },
+    { title: "Sample approval", copy: "Review the physical sample and confirm details before production begins." },
+  ]);
+  const certificationEvidence = JSON.parse((await section("certifications", "evidence")).dataJson).panels;
+  assert.deepEqual(certificationEvidence.map(({ src, alt, width, height }) => ({ src, alt, width, height })), [
+    { src: "/company/detail-panels/09-company-profile-hd.webp", alt: "Muxcor company profile", width: 1076, height: 810 },
+    { src: "/company/detail-panels/11-factory-overview-hd.webp", alt: "Muxcor factory production overview", width: 1070, height: 950 },
+    { src: "/company/detail-panels/12-process-flow-hd.webp", alt: "Jewelry production process flow", width: 1076, height: 886 },
+  ]);
   const capabilities = JSON.parse((await section("about", "capabilities")).dataJson).capabilities;
   assert.equal(capabilities.length, 4);
   assert.equal(capabilities[0].title, "Broad jewelry range");
@@ -240,6 +287,10 @@ test("CMS seed covers current page structures", async () => {
   const assurance = JSON.parse((await section("customization", "assurance")).dataJson).checklist;
   assert.equal(assurance.length, 4);
   assert.match(assurance[2], /Sample appearance/);
+  const assuranceSection = await section("customization", "assurance");
+  assert.equal(assuranceSection.buttonLabel, "Request a sample discussion");
+  assert.equal(assuranceSection.buttonHref, "mailto:Crescent@muxcor.com?subject=Custom%20jewelry%20sample%20request");
+  assert.deepEqual(JSON.parse(assuranceSection.dataJson).secondaryAction, { label: "Review certifications", href: "/certifications" });
 
   const certificationSummary = JSON.parse((await section("certifications", "summary")).dataJson).areas;
   assert.equal(certificationSummary.length, 4);
@@ -247,6 +298,54 @@ test("CMS seed covers current page structures", async () => {
   const certificateLibrary = JSON.parse((await section("certifications", "library")).dataJson).certificates;
   assert.equal(certificateLibrary.length, 10);
   assert.equal(certificateLibrary[0].title, "ISO 9001 Quality Management");
+  assert.ok(certificateLibrary.every((certificate) => certificate.actionLabel && certificate.actionHref));
+  assert.equal(certificateLibrary[0].actionLabel, "View PDF");
+  assert.equal(certificateLibrary[0].actionHref, "/company/certificates/iso-9001.pdf");
+  assert.equal(certificateLibrary[2].actionLabel, "Request document");
+  assert.equal(certificateLibrary[2].actionHref, "mailto:Crescent@muxcor.com?subject=Verified%20Supplier%20Assessment%20Report%20document%20request");
+  const productEditorial = JSON.parse((await section("product-detail", "editorial")).dataJson).groups;
+  assert.deepEqual(productEditorial, [
+    {
+      id: "product",
+      label: "Product details",
+      title: "Pearl necklace details and styling",
+      copy: "Material, construction, wearing, and styling references for the pearl necklace collection.",
+      necklacesOnly: true,
+      panels: [
+        { src: "/company/detail-panels/03-necklace-hero-hd.webp", alt: "Pearl necklace collection overview", width: 1072, height: 1448 },
+        { src: "/company/detail-panels/04-necklace-details-hd.webp", alt: "Pearl necklace construction and material details", width: 1078, height: 1036 },
+        { src: "/company/detail-panels/05-quality-assurance-hd.webp", alt: "Pearl necklace quality assurance", width: 1072, height: 1018 },
+        { src: "/company/detail-panels/06-product-advantages-hd.webp", alt: "Pearl jewelry product advantages", width: 1068, height: 1296 },
+        { src: "/company/detail-panels/07-styling-and-more-products-hd.webp", alt: "Pearl jewelry styling and related product references", width: 1072, height: 1398 },
+      ],
+    },
+    {
+      id: "customization",
+      label: "Customization",
+      title: "OEM and ODM options",
+      copy: "A visual reference for the design, sampling, materials, craftsmanship, production, and delivery workflow.",
+      panels: [
+        { src: "/company/detail-panels/01-oem-odm-overview-hd.webp", alt: "Muxcor OEM and ODM jewelry overview", width: 1078, height: 1506 },
+        { src: "/company/detail-panels/02-customization-options-hd.webp", alt: "Muxcor jewelry customization options", width: 1080, height: 1734 },
+      ],
+    },
+    {
+      id: "company",
+      label: "Factory and trust",
+      title: "Company, production, and delivery evidence",
+      copy: "Customer feedback, company information, factory production, process flow, certificates, service commitments, and shipment references.",
+      panels: [
+        { src: "/company/detail-panels/08-customer-reviews-hd.webp", alt: "Customer review highlights", width: 1074, height: 1308 },
+        { src: "/company/detail-panels/09-company-profile-hd.webp", alt: "Muxcor company profile", width: 1076, height: 810 },
+        { src: "/company/detail-panels/10-about-muxcor-hd.webp", alt: "About Guangzhou Muxcor International", width: 1076, height: 986 },
+        { src: "/company/detail-panels/11-factory-overview-hd.webp", alt: "Muxcor factory and jewelry production teams", width: 1070, height: 950 },
+        { src: "/company/detail-panels/12-process-flow-hd.webp", alt: "Jewelry manufacturing process flow", width: 1076, height: 886 },
+        { src: "/company/detail-panels/13-certificate-collection-hd.webp", alt: "Muxcor certificate collection", width: 1070, height: 636 },
+        { src: "/company/detail-panels/14-service-commitments-hd.webp", alt: "Muxcor product and service commitments", width: 1072, height: 800 },
+        { src: "/company/detail-panels/15-packaging-shipping-hd.webp", alt: "Jewelry packaging and shipping", width: 1072, height: 980 },
+      ],
+    },
+  ]);
   const afterSalesMedia = JSON.parse((await section("after-sales", "evidence")).dataJson).media;
   assert.equal(afterSalesMedia.length, 2);
   assert.match(afterSalesMedia[1].caption, /Packaging and shipment/);
