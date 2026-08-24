@@ -13,6 +13,7 @@ function copyPresent(input: Record<string, any>, fields: readonly string[]) {
 export function categoryScalarData(input: Record<string, any>) {
   return {
     ...copyPresent(input, CATEGORY_TEXT_FIELDS),
+    ...(input.parentId !== undefined ? { parentId: input.parentId } : {}),
     ...(input.imageUrl !== undefined ? { imageUrl: input.imageUrl || null } : {}),
     ...(input.sortOrder !== undefined ? { sortOrder: input.sortOrder } : {}),
   };

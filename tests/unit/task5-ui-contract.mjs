@@ -42,10 +42,10 @@ test("customer and order lists expose search, filters, and pagination controls",
   for (const file of ["CustomerList.tsx", "OrderList.tsx"]) {
     const source = readFileSync(path.join(root, "src/components/admin", file), "utf8");
     assert.match(source, /pageSize/);
-    assert.match(source, /Previous/);
-    assert.match(source, /Next/);
+    assert.match(source, /上一页/);
+    assert.match(source, /下一页/);
   }
-  assert.match(readFileSync(path.join(root, "src/components/admin/OrderList.tsx"), "utf8"), /Search order or customer/);
+  assert.match(readFileSync(path.join(root, "src/components/admin/OrderList.tsx"), "utf8"), /搜索订单号或客户/);
 });
 
 test("admin customer and order pages do not preload unbounded database rows", () => {

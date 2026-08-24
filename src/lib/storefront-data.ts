@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import fallbackSnapshot from "@/data/storefront-products.json";
+import { buildStoreCategoryTree, formatStoreCategoryAssignments, type StoreCategoryAssignment, type StoreCategoryNode } from '@/lib/storefront-category';
 
 export type StoreProduct = {
   id: string;
@@ -17,6 +18,7 @@ export type StoreProduct = {
   finish: string;
   stones: string;
   collection: string;
+  categoryAssignments: StoreCategoryAssignment[];
 };
 
 const fallbackByCategory = {
@@ -26,7 +28,23 @@ const fallbackByCategory = {
   "Women's Bags": "/media/company-showroom.png",
 };
 
-const fallbackStoreProducts = fallbackSnapshot as StoreProduct[];
+const fallbackCategoryRows = [
+  { id: 1, parentId: null, name: 'Necklaces', slug: 'necklaces', sortOrder: 0, productIds: [] as number[] },
+  { id: 2, parentId: null, name: 'Rings', slug: 'rings', sortOrder: 1, productIds: [] as number[] },
+  { id: 3, parentId: null, name: 'Jewelry Sets', slug: 'jewelry-sets', sortOrder: 2, productIds: [] as number[] },
+  { id: 4, parentId: null, name: "Women's Bags", slug: 'womens-bags', sortOrder: 3, productIds: [] as number[] },
+];
+
+const fallbackStoreProducts = (fallbackSnapshot as Omit<StoreProduct, 'categoryAssignments'>[]).map((product) => {
+  const fallbackCategory = fallbackCategoryRows.find((row) => row.name === product.category) || fallbackCategoryRows[0];
+  fallbackCategory.productIds.push(product.dbId);
+  return {
+    ...product,
+    categoryAssignments: [{ id: fallbackCategory.id, slug: fallbackCategory.slug, name: fallbackCategory.name, rootId: fallbackCategory.id, path: [fallbackCategory.name] }],
+  };
+});
+
+const fallbackStoreCategoryTree = buildStoreCategoryTree(fallbackCategoryRows);
 
 function stripHtml(value: string) {
   return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -48,7 +66,7 @@ function normalizeCategory(product: any): StoreProduct["category"] {
   return "Necklaces";
 }
 
-export function formatStoreProduct(product: any): StoreProduct {
+export function formatStoreProduct(product: any, categoryRows: any[] = []): StoreProduct {
   const category = normalizeCategory(product);
   const images = product.images?.length
     ? product.images.map((image: any) => image.src)
@@ -84,20 +102,45 @@ export function formatStoreProduct(product: any): StoreProduct {
           : category === "Women's Bags"
             ? "Women's Bags"
             : "Necklaces"),
+    categoryAssignments: formatStoreCategoryAssignments(categoryRows, (product.categories || []).map((item: any) => item.id)),
   };
+}
+
+async function loadCategoryRows() {
+  return prisma.category.findMany({
+    orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      parentId: true,
+      name: true,
+      slug: true,
+      sortOrder: true,
+      products: { select: { id: true } },
+    },
+  });
+}
+
+export async function getStoreCategoryTree(): Promise<StoreCategoryNode[]> {
+  try {
+    const rows = await loadCategoryRows();
+    return buildStoreCategoryTree(rows.map((row) => ({ ...row, productIds: row.products.map((product) => product.id) })));
+  } catch (error) {
+    console.error('Failed to load store categories from database', error);
+    return fallbackStoreCategoryTree;
+  }
 }
 
 export async function getStoreProducts() {
   try {
-    const products = await prisma.product.findMany({
+    const [products, categoryRows] = await Promise.all([prisma.product.findMany({
       orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
       include: {
         images: { orderBy: { sortOrder: "asc" } },
         categories: true,
         skus: { include: { images: { orderBy: { sortOrder: "asc" } } } },
       },
-    });
-    return products.map(formatStoreProduct);
+    }), loadCategoryRows()]);
+    return products.map((product) => formatStoreProduct(product, categoryRows));
   } catch (error) {
     console.error("Failed to load store products from database", error);
     return fallbackStoreProducts;
@@ -106,7 +149,7 @@ export async function getStoreProducts() {
 
 export async function getFeaturedStoreProducts() {
   try {
-    const products = await prisma.product.findMany({
+    const [products, categoryRows] = await Promise.all([prisma.product.findMany({
       where: { featured: true },
       orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
       take: 8,
@@ -115,8 +158,8 @@ export async function getFeaturedStoreProducts() {
         categories: true,
         skus: { include: { images: { orderBy: { sortOrder: "asc" } } } },
       },
-    });
-    if (products.length) return products.map(formatStoreProduct);
+    }), loadCategoryRows()]);
+    if (products.length) return products.map((product) => formatStoreProduct(product, categoryRows));
     return (await getStoreProducts()).slice(0, 8);
   } catch (error) {
     console.error("Failed to load featured store products from database", error);
@@ -126,15 +169,15 @@ export async function getFeaturedStoreProducts() {
 
 export async function getStoreProductBySlug(slug: string) {
   try {
-    const product = await prisma.product.findUnique({
+    const [product, categoryRows] = await Promise.all([prisma.product.findUnique({
       where: { slug },
       include: {
         images: { orderBy: { sortOrder: "asc" } },
         categories: true,
         skus: { include: { images: { orderBy: { sortOrder: "asc" } } } },
       },
-    });
-    return product ? formatStoreProduct(product) : null;
+    }), loadCategoryRows()]);
+    return product ? formatStoreProduct(product, categoryRows) : null;
   } catch (error) {
     console.error("Failed to load store product from database", error);
     return fallbackStoreProducts.find((product) => product.id === slug) || null;

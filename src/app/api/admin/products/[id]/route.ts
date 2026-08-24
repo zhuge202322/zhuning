@@ -5,6 +5,7 @@ import { errorResponse, parsePositiveId, validateProductInput } from '@/lib/inpu
 import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
 import { productImageCreates, productScalarData, productSkuCreates } from '@/lib/catalog-write-data';
 import { assertLocalMediaAssetsExist, MissingMediaAssetError } from '@/lib/media-asset-validation';
+import { validateSameRootSelection } from '@/lib/category-tree';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +65,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   } = body;
 
   try {
-  const product = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
   const current = await tx.product.findUnique({
     where: { id: pid },
     select: {
@@ -74,12 +75,17 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
       skus: { select: { image: true, images: { select: { src: true } } } },
     },
   });
-  if (!current) return tx.product.update({ where: { id: pid }, data: {} });
+  if (!current) return { error: '产品不存在' };
+  if (categoryIds !== undefined) {
+    const categoryRows = await tx.category.findMany({ select: { id: true, parentId: true } });
+    const categoryValidation = validateSameRootSelection(categoryRows, categoryIds || []);
+    if (!categoryValidation.ok) return { error: categoryValidation.error || '产品类目无效' };
+  }
   await assertLocalMediaAssetsExist(tx, body, { allowedLegacyUrls: importedProductMediaUrls(current) });
   if (images !== undefined) await tx.productImage.deleteMany({ where: { productId: pid } });
   if (skus !== undefined) await tx.productSku.deleteMany({ where: { productId: pid } });
 
-  return tx.product.update({
+  const product = await tx.product.update({
     where: { id: pid },
     data: {
       ...productScalarData(body),
@@ -95,9 +101,11 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     },
     include: { images: true, categories: true, skus: true },
   });
+  return { product };
   });
 
-  return NextResponse.json(product);
+  if ('error' in result) return errorResponse(result.error || '产品类目无效');
+  return NextResponse.json(result.product);
   } catch (error) {
     if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
     return prismaErrorResponse(error) ?? NextResponse.json({ error: '服务器内部错误' }, { status: 500 });

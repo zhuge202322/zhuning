@@ -19,6 +19,7 @@ export function formatCategory(c: any, locale: Locale = 'en'): any {
     id: c.id,
     name: pick(c.name, c.nameFr || '', c.nameEs || '', c.nameAr || '', locale),
     slug: c.slug,
+    parentId: c.parentId ?? null,
     count: c._count?.products ?? 0,
     image: c.imageUrl ? { src: c.imageUrl } : undefined,
   };
@@ -69,6 +70,7 @@ export function formatProduct(p: any, locale: Locale = 'en'): any {
       id: c.id,
       name: pick(c.name, c.nameFr || '', c.nameEs || '', c.nameAr || '', locale),
       slug: c.slug,
+      parentId: c.parentId ?? null,
     })),
     skus: (p.skus || []).map((s: any) => {
       const skuImages = s.images?.length

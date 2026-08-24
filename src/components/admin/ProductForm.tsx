@@ -11,7 +11,7 @@ import { Save, ArrowLeft, Plus, Trash2, Layers, FileText, X } from 'lucide-react
 import Link from 'next/link';
 import { LOCALE_LABEL } from './admin-labels';
 
-type Category = { id: number; name: string };
+type Category = { id: number; name: string; depth: number; rootId: number; pathLabel: string };
 
 type LocaleStrings = Record<TranslationLocale, string>;
 
@@ -93,7 +93,13 @@ export default function ProductForm({ mode, productId, initial, categories }: Pr
   }
 
   function toggleCategory(id: number) {
-    setCategoryIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setCategoryIds((prev) => {
+      if (prev.includes(id)) return prev.filter((item) => item !== id);
+      const category = categories.find((item) => item.id === id);
+      const selectedRoot = categories.find((item) => prev.includes(item.id))?.rootId;
+      if (!category || (selectedRoot !== undefined && category.rootId !== selectedRoot)) return prev;
+      return [...prev, id];
+    });
   }
 
   function addSku() {
@@ -227,21 +233,28 @@ export default function ProductForm({ mode, productId, initial, categories }: Pr
 
         <div>
           <label className="block text-sm font-bold text-slate-700 mb-2">产品类目</label>
-          <div className="flex flex-wrap gap-2">
+          <p className="mb-3 text-xs text-slate-500">可以选择同一主分类下的多个分类。</p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {categories.map((c) => {
               const active = categoryIds.includes(c.id);
+              const selectedRoot = categories.find((item) => categoryIds.includes(item.id))?.rootId;
+              const disabled = !active && selectedRoot !== undefined && c.rootId !== selectedRoot;
               return (
                 <button
                   key={c.id}
                   type="button"
                   onClick={() => toggleCategory(c.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold border transition ${
+                  disabled={disabled}
+                  className={`flex min-h-10 items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs font-bold transition ${
                     active
                       ? 'bg-brand-primary text-white border-brand-primary'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-brand-primary'
+                      : disabled
+                        ? 'cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300'
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-brand-primary'
                   }`}
                 >
-                  {c.name}
+                  <span className={`h-3.5 w-3.5 shrink-0 rounded border ${active ? 'border-white bg-white/20' : 'border-current'}`} />
+                  <span style={{ paddingLeft: `${c.depth * 10}px` }}>{c.pathLabel}</span>
                 </button>
               );
             })}

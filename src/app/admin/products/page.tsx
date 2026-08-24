@@ -2,17 +2,18 @@ import Link from 'next/link';
 import { Plus, Database } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import ProductDeleteButton from '@/components/admin/ProductDeleteButton';
+import { categoryPath } from '@/lib/category-tree';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminProductsPage() {
-  const products = await prisma.product.findMany({
+  const [products, categoryRows] = await Promise.all([prisma.product.findMany({
     orderBy: [{ sortOrder: 'asc' }, { id: 'desc' }],
     include: {
       images: { orderBy: { sortOrder: 'asc' }, take: 1 },
       categories: true,
     },
-  });
+  }), prisma.category.findMany({ select: { id: true, name: true, parentId: true } })]);
 
   return (
     <div>
@@ -64,7 +65,7 @@ export default async function AdminProductsPage() {
                 </td>
                 <td className="px-4 py-3 text-slate-500 font-mono text-xs">{p.slug}</td>
                 <td className="px-4 py-3 text-slate-600">
-                  {p.categories.map((c) => c.name).join(', ') || '—'}
+                  {p.categories.map((category) => categoryPath(categoryRows, category.id).map((item) => item.name).join(' / ')).join(', ') || '—'}
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex gap-2">

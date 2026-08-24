@@ -21,13 +21,13 @@ test("admin UI uploads media only through the MediaAsset API", () => {
   assert.deepEqual(offenders, []);
 });
 
-test("media clients use cursor items, Load more, and raw MP4 headers", () => {
+test("media clients use cursor items, localized load more, and raw MP4 headers", () => {
   for (const name of ["MediaLibrary.tsx", "MediaPicker.tsx"]) {
     const source = readFileSync(path.join(adminComponents, name), "utf8");
     assert.equal(source.includes("data.assets"), false, name);
     assert.equal(source.includes("data.items"), true, name);
     assert.equal(source.includes("nextCursor"), true, name);
-    assert.equal(source.includes("Load more"), true, name);
+    assert.equal(source.includes("加载更多"), true, name);
   }
   const uploadSource = readFileSync(path.join(adminComponents, "uploadMediaAsset.ts"), "utf8");
   assert.equal(uploadSource.includes("application/octet-stream"), true);

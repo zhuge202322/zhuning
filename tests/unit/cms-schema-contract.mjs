@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import test, { after, before } from "node:test";
@@ -26,6 +26,30 @@ const childEnvironment = {
 };
 
 let prisma;
+
+function readTextFile(filePath) {
+  const content = readFileSync(filePath);
+  return content[0] === 0xff && content[1] === 0xfe
+    ? content.subarray(2).toString("utf16le")
+    : content.toString("utf8");
+}
+
+test("category schema and bootstrap SQL support a restricted parent relation", () => {
+  const schema = readTextFile(path.join(repositoryRoot, "prisma", "schema.prisma"));
+  const initSql = readTextFile(path.join(repositoryRoot, "prisma", "init.sql"));
+  const migrationSql = readTextFile(
+    path.join(repositoryRoot, "prisma", "migrations", "20260824000000_add_category_tree", "migration.sql"),
+  );
+
+  assert.match(schema, /parentId\s+Int\?/);
+  assert.match(schema, /parent\s+Category\?\s+@relation\("CategoryTree"/);
+  assert.match(schema, /children\s+Category\[\]\s+@relation\("CategoryTree"\)/);
+  assert.match(schema, /@@index\(\[parentId\]\)/);
+  assert.match(initSql, /"parentId" INTEGER/);
+  assert.match(initSql, /Category_parentId_fkey/);
+  assert.match(migrationSql, /Category_parentId_fkey/);
+  assert.match(migrationSql, /ON DELETE RESTRICT/);
+});
 
 before(async () => {
   new DatabaseSync(databasePath).close();

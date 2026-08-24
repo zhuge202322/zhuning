@@ -1,4 +1,17 @@
 @import "tailwindcss";
+
+.admin-input {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  outline: none;
+}
+
+.admin-input:focus {
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
+}
 @plugin "@tailwindcss/typography";
 
 @theme {

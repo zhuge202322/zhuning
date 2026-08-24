@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ProductListView } from "@/components/ProductListView";
-import { getStoreProducts } from "@/lib/storefront-data";
+import { getStoreCategoryTree, getStoreProducts } from "@/lib/storefront-data";
 
 export const dynamic = "force-dynamic";
 
@@ -12,14 +12,6 @@ export const metadata: Metadata = {
 type ProductsPageProps = {
   searchParams: Promise<{ category?: string; max?: string; min?: string; sort?: string }>;
 };
-
-function normalizeCategory(category?: string) {
-  if (category === "necklaces") return "Necklaces";
-  if (category === "rings") return "Rings";
-  if (category === "jewelry-sets") return "Jewelry Sets";
-  if (category === "bags") return "Women's Bags";
-  return "All";
-}
 
 function normalizeSort(sort?: string) {
   if (sort === "price-low") return "Price Low";
@@ -35,14 +27,15 @@ function normalizePrice(value?: string) {
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const { category, max, min, sort } = await searchParams;
-  const products = await getStoreProducts();
+  const [products, categories] = await Promise.all([getStoreProducts(), getStoreCategoryTree()]);
   return (
     <ProductListView
-      initialCategory={normalizeCategory(category)}
+      initialCategorySlug={category || ""}
       initialMaxPrice={normalizePrice(max)}
       initialMinPrice={normalizePrice(min)}
       initialSortMode={normalizeSort(sort)}
       products={products}
+      categories={categories}
     />
   );
 }

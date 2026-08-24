@@ -28,3 +28,12 @@ test("category and post scalar schemas reject wrong values", () => {
   assert.equal(validatePostInput({ title: "News", slug: "news", date: 1 }, "create").ok, false);
   assert.equal(validatePostInput({ title: "News", slug: "news", content: {} }, "create").ok, false);
 });
+
+test("category parent accepts null or a positive integer only", () => {
+  assert.equal(validateCategoryInput({ name: "Rings", slug: "rings", parentId: null }, "create").ok, true);
+  assert.equal(validateCategoryInput({ name: "Bands", slug: "bands", parentId: 1 }, "create").ok, true);
+  assert.equal(validateCategoryInput({ parentId: null }, "update").ok, true);
+  for (const parentId of [0, -1, "1", 1.5]) {
+    assert.equal(validateCategoryInput({ parentId }, "update").ok, false);
+  }
+});

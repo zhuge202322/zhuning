@@ -5,6 +5,7 @@ import { errorResponse, validateCategoryInput } from '@/lib/input-validation';
 import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
 import { categoryScalarData } from '@/lib/catalog-write-data';
 import { assertLocalMediaAssetsExist, MissingMediaAssetError } from '@/lib/media-asset-validation';
+import { validateParentChange } from '@/lib/category-tree';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,11 +29,16 @@ export async function POST(req: NextRequest) {
   if (!validation.ok) return errorResponse(validation.error || 'Invalid category data');
   const { name, slug, imageUrl, nameFr, nameEs, nameAr } = body;
   try {
-    const cat = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
+      const rows = await tx.category.findMany({ select: { id: true, parentId: true } });
+      const parentValidation = validateParentChange(rows, null, body.parentId ?? null);
+      if (!parentValidation.ok) return { error: parentValidation.error || '父分类无效' };
       await assertLocalMediaAssetsExist(tx, body);
-      return tx.category.create({ data: categoryScalarData(body) as any });
+      const category = await tx.category.create({ data: categoryScalarData(body) as any });
+      return { category };
     });
-    return NextResponse.json(cat);
+    if ('error' in result) return errorResponse(result.error || '父分类无效');
+    return NextResponse.json(result.category);
   } catch (error) {
     if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
     return prismaErrorResponse(error) ?? NextResponse.json({ error: '服务器内部错误' }, { status: 500 });

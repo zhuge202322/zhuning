@@ -101,3 +101,25 @@ test("legacy database can be baselined then upgraded without catalog loss", () =
   assert.ok(pageSection);
   assert.equal(mediaStatus.dflt_value, "'ACTIVE'");
 });
+
+test("legacy upgrade stops when a product has multiple top-level categories", () => {
+  const databasePath = path.join(temporaryDirectory, "legacy-conflict.db");
+  createEmptyDatabase(databasePath);
+  const database = new DatabaseSync(databasePath);
+  database.exec(readFileSync(baselineSqlPath, "utf8"));
+  database.exec(`
+    INSERT INTO "Category" ("name", "slug", "createdAt", "updatedAt") VALUES
+      ('Rings', 'rings', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+      ('Necklaces', 'necklaces', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    INSERT INTO "Product" ("name", "slug", "createdAt", "updatedAt")
+      VALUES ('Legacy Product', 'legacy-product', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    INSERT INTO "_ProductCategories" ("A", "B") VALUES (1, 1), (2, 1);
+  `);
+  database.close();
+
+  runPrisma(["migrate", "resolve", "--applied", baselineId, "--schema", schemaPath], databasePath);
+  assert.throws(
+    () => runPrisma(["migrate", "deploy", "--schema", schemaPath], databasePath),
+    /migration failed|constraint failed|CHECK constraint/i,
+  );
+});

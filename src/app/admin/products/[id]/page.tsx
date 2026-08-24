@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ProductForm from '@/components/admin/ProductForm';
+import { flattenCategoryTree } from '@/lib/category-tree';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     }),
     prisma.category.findMany({
       orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
-      select: { id: true, name: true },
+      select: { id: true, name: true, parentId: true, sortOrder: true },
     }),
   ]);
 
@@ -36,7 +37,13 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       <ProductForm
         mode="edit"
         productId={product.id}
-        categories={categories}
+        categories={flattenCategoryTree(categories).map((category) => ({
+          id: category.id,
+          name: category.name,
+          depth: category.depth,
+          rootId: category.path[0].id,
+          pathLabel: category.path.map((item) => item.name).join(' / '),
+        }))}
         initial={{
           name: product.name,
           slug: product.slug,

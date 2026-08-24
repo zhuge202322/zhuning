@@ -80,6 +80,9 @@ export function validateCategoryInput(input, mode = "create") {
   if (stringError) return { ok: false, error: stringError };
   if (!validOptionalMedia(input.imageUrl)) return { ok: false, error: "类目媒体地址无效" };
   if (input.sortOrder !== undefined && !validSortOrder(input.sortOrder)) return { ok: false, error: "排序值无效" };
+  if (input.parentId !== undefined && input.parentId !== null && (!Number.isInteger(input.parentId) || input.parentId <= 0)) {
+    return { ok: false, error: "父分类无效" };
+  }
   return { ok: true, value: input };
 }
 

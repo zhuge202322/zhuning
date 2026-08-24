@@ -5,6 +5,7 @@ import { errorResponse, validateProductInput } from '@/lib/input-validation';
 import { parseJsonObject, prismaErrorResponse } from '@/lib/api-route';
 import { productImageCreates, productScalarData, productSkuCreates } from '@/lib/catalog-write-data';
 import { assertLocalMediaAssetsExist, MissingMediaAssetError } from '@/lib/media-asset-validation';
+import { validateSameRootSelection } from '@/lib/category-tree';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,9 +41,12 @@ export async function POST(req: NextRequest) {
   } = body;
 
   try {
-  const product = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
+  const categoryRows = await tx.category.findMany({ select: { id: true, parentId: true } });
+  const categoryValidation = validateSameRootSelection(categoryRows, categoryIds || []);
+  if (!categoryValidation.ok) return { error: categoryValidation.error || '产品类目无效' };
   await assertLocalMediaAssetsExist(tx, body);
-  return tx.product.create({
+  const product = await tx.product.create({
     data: {
       ...productScalarData(body),
       categories: categoryIds?.length
@@ -57,9 +61,11 @@ export async function POST(req: NextRequest) {
     } as any,
     include: { images: true, categories: true, skus: true },
   });
+  return { product };
   });
 
-  return NextResponse.json(product);
+  if ('error' in result) return errorResponse(result.error || '产品类目无效');
+  return NextResponse.json(result.product);
   } catch (error) {
     if (error instanceof MissingMediaAssetError) return errorResponse(error.message);
     return prismaErrorResponse(error) ?? NextResponse.json({ error: '服务器内部错误' }, { status: 500 });

@@ -50,7 +50,7 @@ export function ProductCard({ motionIndex = 0, product }: { motionIndex?: number
         />
       </Link>
       <div className="product-copy">
-        <span>{product.category}</span>
+        <span>{product.categoryAssignments.map((item) => item.path.join(" / ")).join(" · ") || product.category}</span>
         <h3>
           <Link href={`/products/${product.id}`} title={product.name}>
             {product.name}

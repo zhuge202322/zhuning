@@ -66,17 +66,22 @@ model MediaAsset {
 }
 
 model Category {
-  id        Int       @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   name      String
-  slug      String    @unique
+  slug      String     @unique
+  parentId  Int?
   imageUrl  String?
-  sortOrder Int       @default(0)
-  nameFr    String    @default("")
-  nameEs    String    @default("")
-  nameAr    String    @default("")
-  products  Product[] @relation("ProductCategories")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  sortOrder Int        @default(0)
+  nameFr    String     @default("")
+  nameEs    String     @default("")
+  nameAr    String     @default("")
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  children  Category[] @relation("CategoryTree")
+  products  Product[]  @relation("ProductCategories")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([parentId])
 }
 
 model Product {
