@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 type ProductsPageProps = {
-  searchParams: Promise<{ category?: string; max?: string; min?: string; sort?: string }>;
+  searchParams: Promise<{ category?: string; max?: string; min?: string; sort?: string; page?: string }>;
 };
 
 function normalizeSort(sort?: string) {
@@ -26,7 +26,7 @@ function normalizePrice(value?: string) {
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const { category, max, min, sort } = await searchParams;
+  const { category, max, min, sort, page } = await searchParams;
   const [products, categories] = await Promise.all([getStoreProducts(), getStoreCategoryTree()]);
   return (
     <ProductListView
@@ -34,6 +34,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       initialMaxPrice={normalizePrice(max)}
       initialMinPrice={normalizePrice(min)}
       initialSortMode={normalizeSort(sort)}
+      initialPage={page || "1"}
       products={products}
       categories={categories}
     />

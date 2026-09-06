@@ -1,9 +1,11 @@
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { PageMotion } from "@/components/PageMotion";
 import { ProductCard } from "@/components/ProductCard";
 import { formatProductPrice } from "@/lib/currency";
 import { productMatchesCategory, type StoreCategoryNode } from '@/lib/storefront-category';
+import { getPaginationItems, paginateProducts } from "@/lib/product-list-core.mjs";
 import type { StoreProduct } from "@/lib/storefront-data";
 
 type SortMode = "Featured" | "Price Low" | "Price High";
@@ -20,6 +22,7 @@ export function ProductListView({
   initialMaxPrice = "",
   initialMinPrice = "",
   initialSortMode = "Featured",
+  initialPage = "1",
   products,
   categories,
 }: {
@@ -27,6 +30,7 @@ export function ProductListView({
   initialMaxPrice?: string;
   initialMinPrice?: string;
   initialSortMode?: SortMode;
+  initialPage?: string;
   products: StoreProduct[];
   categories: StoreCategoryNode[];
 }) {
@@ -47,6 +51,8 @@ export function ProductListView({
     : initialSortMode === "Price High"
       ? [...byPrice].sort((a, b) => b.price - a.price)
       : byPrice;
+  const pagination = paginateProducts(filteredProducts, Number(initialPage), 20);
+  const paginatedProducts = pagination.items as StoreProduct[];
   const filtersActive = Boolean(selectedCategory || minPrice || maxPrice || initialSortMode !== "Featured");
 
   function categoryHref(slug: string) {
@@ -55,6 +61,17 @@ export function ProductListView({
     if (minPrice) params.set("min", minPrice);
     if (maxPrice) params.set("max", maxPrice);
     if (initialSortMode !== "Featured") params.set("sort", sortParamByMode[initialSortMode]);
+    const query = params.toString();
+    return query ? `/products?${query}` : "/products";
+  }
+
+  function pageHref(page: number) {
+    const params = new URLSearchParams();
+    if (selectedCategory) params.set("category", selectedCategory.slug);
+    if (minPrice) params.set("min", minPrice);
+    if (maxPrice) params.set("max", maxPrice);
+    if (initialSortMode !== "Featured") params.set("sort", sortParamByMode[initialSortMode]);
+    if (page > 1) params.set("page", String(page));
     const query = params.toString();
     return query ? `/products?${query}` : "/products";
   }
@@ -83,9 +100,9 @@ export function ProductListView({
                   className={selectedCategory?.id === item.id ? "active" : ""}
                   aria-current={selectedCategory?.id === item.id ? "page" : undefined}
                   href={categoryHref(item.slug)}
-                  style={{ paddingLeft: `${14 + item.depth * 18}px` }}
+                  style={{ "--category-depth": item.depth } as CSSProperties}
                 >
-                  <span>{item.name}</span><strong>{item.productCount}</strong>
+                  <span className="category-link-name"><span className="category-depth-marker" aria-hidden="true" />{item.name}</span><strong>{item.productCount}</strong>
                 </Link>
               ))}
             </div>
@@ -112,9 +129,23 @@ export function ProductListView({
           </div>
           <section className="product-section listing-section" aria-label="All products">
             <div className="product-grid">
-              {filteredProducts.map((product, index) => <ProductCard product={product} motionIndex={index} key={product.id} />)}
+              {paginatedProducts.map((product, index) => <ProductCard product={product} motionIndex={index} key={product.id} />)}
               {filteredProducts.length === 0 && <div className="catalog-empty-state"><h2>No products found</h2><p>Try another category or adjust the price range.</p></div>}
             </div>
+            {filteredProducts.length > 0 ? (
+              <nav className="product-pagination" aria-label="Product pages">
+                <span className="pagination-summary">Showing {(pagination.page - 1) * pagination.pageSize + 1}-{Math.min(pagination.page * pagination.pageSize, pagination.totalItems)} of {pagination.totalItems}</span>
+                <div className="pagination-controls">
+                  <Link className={pagination.page <= 1 ? "disabled" : ""} aria-disabled={pagination.page <= 1} href={pageHref(Math.max(1, pagination.page - 1))}>Previous</Link>
+                  {getPaginationItems(pagination.page, pagination.totalPages).map((item, index) => item === "ellipsis" ? (
+                    <span className="pagination-ellipsis" aria-hidden="true" key={`ellipsis-${index}`}>...</span>
+                  ) : (
+                    <Link className={item === pagination.page ? "active" : ""} aria-current={item === pagination.page ? "page" : undefined} href={pageHref(item)} key={item}>{item}</Link>
+                  ))}
+                  <Link className={pagination.page >= pagination.totalPages ? "disabled" : ""} aria-disabled={pagination.page >= pagination.totalPages} href={pageHref(Math.min(pagination.totalPages, pagination.page + 1))}>Next</Link>
+                </div>
+              </nav>
+            ) : null}
           </section>
         </div>
       </section>

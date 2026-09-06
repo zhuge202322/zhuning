@@ -1213,11 +1213,41 @@ img {
 }
 
 .sidebar-category-list a {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   padding: 0 12px;
+}
+
+.category-link-name {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.category-depth-marker {
+  position: relative;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+.category-depth-marker::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: calc(var(--category-depth, 0) * 5px);
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  border-radius: 50%;
+  opacity: 0.46;
+  transform: translateY(-50%);
 }
 
 .sidebar-category-list a:hover,
@@ -1349,6 +1379,67 @@ img {
 
 .listing-section {
   padding-top: 36px;
+}
+
+.product-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 32px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(142, 112, 107, 0.18);
+}
+
+.pagination-summary {
+  color: #574a47;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.pagination-controls a {
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0 10px;
+  color: #3f3331;
+  background: #ffffff;
+  border: 1px solid rgba(142, 112, 107, 0.28);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.pagination-controls a:hover:not(.disabled),
+.pagination-controls a.active {
+  color: #ffffff;
+  background: var(--crimson);
+  border-color: var(--crimson);
+  transform: translateY(-1px);
+}
+
+.pagination-controls a.disabled {
+  pointer-events: none;
+  opacity: 0.42;
+}
+
+.pagination-ellipsis {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  min-height: 40px;
+  color: #574a47;
+  font-weight: 800;
 }
 
 .shop-results .product-section {
@@ -3663,6 +3754,15 @@ img {
 
   .shop-sidebar {
     position: static;
+  }
+
+  .product-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pagination-controls {
+    justify-content: flex-start;
   }
 
   .sidebar-category-list {
