@@ -4,12 +4,11 @@ import Link from "next/link";
 import { ArrowRight, Camera, Factory, Gem, Mail, MapPin, MessageCircle, PackageCheck, Share2, Users } from "lucide-react";
 import { PageMotion } from "@/components/PageMotion";
 import { companyProfile, companyStats, companyTimeline } from "@/data/company";
+import { buildPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "About Muxcor | Jewelry Manufacturer in Guangzhou",
-  description:
-    "Meet Guangzhou Muxcor International Co., Ltd., explore the workshop and showroom, and learn about its jewelry production and customization capabilities.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPublicMetadata({ type: "PAGE", key: "about", pathname: "/about", fallbackTitle: "About Muxcor | Jewelry Manufacturer in Guangzhou", fallbackDescription: "Meet Guangzhou Muxcor International Co., Ltd., explore the workshop and showroom, and learn about its jewelry production and customization capabilities.", fallbackImage: "/company/showroom-interior.webp" });
+}
 
 const gallery = [
   { src: "/company/showroom-interior.webp", alt: "Muxcor jewelry showroom interior" },

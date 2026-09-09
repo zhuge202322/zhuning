@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { ArrowRight, BriefcaseBusiness } from "lucide-react";
 import { PageMotion } from "@/components/PageMotion";
+import { buildPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Women's Bags | Muxcor",
-  description: "Request the current Muxcor women's bags sourcing catalogue.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPublicMetadata({ type: "CATEGORY", key: "womens-bags", pathname: "/collections/womens-bags", fallbackTitle: "Women's Bags | Muxcor", fallbackDescription: "Request the current Muxcor women's bags sourcing catalogue." });
+}
 
 export default function WomensBagsPage() {
   return (

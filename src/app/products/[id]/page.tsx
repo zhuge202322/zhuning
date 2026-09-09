@@ -6,6 +6,9 @@ import {
   getStoreProductBySlug,
   getStoreProducts,
 } from "@/lib/storefront-data";
+import { buildPublicMetadata, getPublicSeoSettings } from "@/lib/public-seo";
+import { ProductJsonLd } from "@/components/ProductJsonLd";
+import { buildCanonicalUrl } from "@/lib/seo-core.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +21,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = await getStoreProductBySlug(id);
   if (!product) return {};
 
-  return {
-    title: `${product.name} | Muxcor`,
-    description: product.note,
-  };
+  return buildPublicMetadata({ type: "PRODUCT", key: product.id, pathname: `/products/${product.id}`, fallbackTitle: product.name, fallbackDescription: product.note, fallbackImage: product.image });
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
@@ -29,5 +29,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const [product, products] = await Promise.all([getStoreProductBySlug(id), getStoreProducts()]);
   if (!product) notFound();
 
-  return <ProductDetailView product={product} relatedProducts={getRelatedStoreProducts(product, products)} />;
+  const { siteUrl } = await getPublicSeoSettings();
+  const canonicalUrl = buildCanonicalUrl(siteUrl, `/products/${product.id}`);
+  return <><ProductJsonLd product={product} canonicalUrl={canonicalUrl} siteUrl={siteUrl} /><ProductDetailView product={product} relatedProducts={getRelatedStoreProducts(product, products)} /></>;
 }

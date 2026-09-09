@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { PolicyPage } from "@/components/PolicyPage";
+import { buildPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Returns & Exchanges | Muxcor",
-  description: "Muxcor return and exchange commitments for jewelry orders.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPublicMetadata({ type: "PAGE", key: "returns", pathname: "/policies/returns", fallbackTitle: "Returns & Exchanges | Muxcor", fallbackDescription: "Muxcor return and exchange commitments for jewelry orders." });
+}
 
 const sections = [
   {

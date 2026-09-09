@@ -4,12 +4,11 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, FilePenLine, Gem, PackageCheck, Palette, ScanSearch } from "lucide-react";
 import { PageMotion } from "@/components/PageMotion";
 import { customizationSteps } from "@/data/company";
+import { buildPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Custom Jewelry Process | Muxcor OEM & ODM",
-  description:
-    "Explore Muxcor's custom jewelry workflow from requirement review and CAD development to sampling, production, polishing, packing, and delivery.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPublicMetadata({ type: "PAGE", key: "customization", pathname: "/customization", fallbackTitle: "Custom Jewelry Process | Muxcor OEM & ODM", fallbackDescription: "Explore Muxcor's custom jewelry workflow from requirement review and CAD development to sampling, production, polishing, packing, and delivery.", fallbackImage: "/company/customization-process.webp" });
+}
 
 const projectInputs = [
   { icon: FilePenLine, title: "Reference and brief", copy: "Sketches, reference images, dimensions, target price, market, and expected quantity." },

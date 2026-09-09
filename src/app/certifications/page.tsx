@@ -3,12 +3,11 @@ import Image from "next/image";
 import { ArrowUpRight, BadgeCheck, FileCheck2, FlaskConical, Globe2, ShieldCheck } from "lucide-react";
 import { PageMotion } from "@/components/PageMotion";
 import { certificates } from "@/data/company";
+import { buildPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Certifications & Test Reports | Muxcor",
-  description:
-    "Review Muxcor company certifications, supplier assessments, representative REACH reports, GPSR support, and German packaging documentation.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPublicMetadata({ type: "PAGE", key: "certifications", pathname: "/certifications", fallbackTitle: "Certifications & Test Reports | Muxcor", fallbackDescription: "Review Muxcor company certifications, supplier assessments, representative REACH reports, GPSR support, and German packaging documentation.", fallbackImage: "/company/detail-panels/13-certificate-collection-hd.webp" });
+}
 
 const complianceAreas = [
   { icon: ShieldCheck, title: "Quality management", copy: "ISO 9001 company quality management documentation." },

@@ -11,6 +11,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export const metadata = {
   title: 'Myklens 管理后台',
+  robots: { index: false, follow: false },
 };
 
 export default async function AdminLayout({

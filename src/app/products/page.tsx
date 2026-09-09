@@ -1,17 +1,41 @@
 import type { Metadata } from "next";
 import { ProductListView } from "@/components/ProductListView";
 import { getStoreCategoryTree, getStoreProducts } from "@/lib/storefront-data";
+import { buildPublicMetadata, getPublicSeoSettings } from "@/lib/public-seo";
+import { robotsForProductList } from "@/lib/public-seo-core.mjs";
 
 export const dynamic = "force-dynamic";
-
-export const metadata: Metadata = {
-  title: "Products | Muxcor Crimson Drop Luxury",
-  description: "Shop Muxcor rings and necklaces in the Crimson Drop Luxury collection.",
-};
 
 type ProductsPageProps = {
   searchParams: Promise<{ category?: string; max?: string; min?: string; sort?: string; page?: string }>;
 };
+
+function findCategory(nodes: Awaited<ReturnType<typeof getStoreCategoryTree>>, slug?: string): (typeof nodes)[number] | null {
+  for (const node of nodes) {
+    if (node.slug === slug) return node;
+    const nested = findCategory(node.children, slug);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+export async function generateMetadata({ searchParams }: ProductsPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const categories = await getStoreCategoryTree();
+  const category = findCategory(categories, params.category);
+  const site = await getPublicSeoSettings();
+  const canonical = new URL("/products", site.siteUrl);
+  if (category) canonical.searchParams.set("category", category.slug);
+  return buildPublicMetadata({
+    type: category ? "CATEGORY" : "PAGE",
+    key: category?.slug || "products",
+    pathname: "/products",
+    canonicalUrl: canonical.toString(),
+    robots: robotsForProductList(params),
+    fallbackTitle: category ? `${category.name} | Muxcor Products` : "Products | Muxcor",
+    fallbackDescription: category ? `Browse ${category.name} products from Muxcor and send an inquiry for pricing, customization and packing details.` : "Browse Muxcor jewelry, bags and fashion accessories and send a product inquiry.",
+  });
+}
 
 function normalizeSort(sort?: string) {
   if (sort === "price-low") return "Price Low";

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { PolicyPage } from "@/components/PolicyPage";
+import { buildPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | Muxcor",
-  description: "Muxcor privacy policy for account, order, and communication data.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPublicMetadata({ type: "PAGE", key: "privacy", pathname: "/policies/privacy", fallbackTitle: "Privacy Policy | Muxcor", fallbackDescription: "Muxcor privacy policy for account, order, and communication data." });
+}
 
 const sections = [
   {

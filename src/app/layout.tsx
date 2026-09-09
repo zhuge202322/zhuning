@@ -1,8 +1,10 @@
 import { headers } from "next/headers";
+import type { Metadata } from "next";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
 import { SiteChrome } from "@/components/SiteChrome";
 import "./globals.css";
 import "./storefront.css";
+import { buildRootMetadata } from "@/lib/public-seo";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -16,10 +18,9 @@ const montserrat = Montserrat({
   variable: "--font-body",
 });
 
-export const metadata = {
-  title: "Muxcor | Jewelry Catalogue & Product Inquiry",
-  description: "English product catalogue and inquiry workflow for Muxcor jewelry and sourcing categories.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildRootMetadata();
+}
 
 export default async function RootLayout({
   children,

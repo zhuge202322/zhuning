@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { PolicyPage } from "@/components/PolicyPage";
+import { buildPublicMetadata } from "@/lib/public-seo";
 
-export const metadata: Metadata = {
-  title: "After-sales Service | Muxcor",
-  description: "Muxcor after-sales support for product inquiries, production issues, and shipment documentation.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPublicMetadata({ type: "PAGE", key: "after-sales", pathname: "/after-sales", fallbackTitle: "After-sales Service | Muxcor", fallbackDescription: "Muxcor after-sales support for product inquiries, production issues, and shipment documentation." });
+}
 
 const sections = [
   {
