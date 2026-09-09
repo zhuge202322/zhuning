@@ -37,6 +37,7 @@ export const PAGE_SECTION_KEYS = {
 
 export const MEDIA_TYPES = ["image", "video", "document"] as const;
 export const ORDER_TYPES = ["INQUIRY", "FORMAL"] as const;
+export const SEO_TARGET_TYPES = ["SITE", "PAGE", "PRODUCT", "CATEGORY", "POST"] as const;
 export const ORDER_STATUSES = [
   "PENDING_INQUIRY",
   "CONTACTED",
@@ -66,6 +67,7 @@ export type PageSectionKey<TPage extends PageKey> = (typeof PAGE_SECTION_KEYS)[T
 export type MediaType = (typeof MEDIA_TYPES)[number];
 export type OrderType = (typeof ORDER_TYPES)[number];
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
+export type SeoTargetType = (typeof SEO_TARGET_TYPES)[number];
 
 export type MediaMetadata = {
   originalName: string;

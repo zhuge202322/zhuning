@@ -25,6 +25,36 @@ model SiteSetting {
   updatedAt DateTime @updatedAt
 }
 
+model AiProviderConfig {
+  id              Int      @id @default(1)
+  endpoint        String
+  model           String
+  encryptedApiKey String   @default("")
+  keyHint         String   @default("")
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model SeoMeta {
+  id           Int      @id @default(autoincrement())
+  targetType   String
+  targetKey    String
+  title        String   @default("")
+  description  String   @default("")
+  keywords     String   @default("")
+  canonicalUrl String   @default("")
+  ogImage      String   @default("")
+  robots       String   @default("index,follow")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([targetType, targetKey])
+  @@index([targetType])
+  @@index([targetKey])
+  @@index([updatedAt])
+}
+
 model PageSection {
   id          Int      @id @default(autoincrement())
   pageKey     String
