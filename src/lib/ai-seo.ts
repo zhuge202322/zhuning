@@ -14,3 +14,4 @@ export const validateAiConfig = core.validateAiConfig as (input: unknown) => Val
   apiKey: string;
 }>;
 export const parseAiSeoResponse = core.parseAiSeoResponse as (text: string) => ParseResult;
+export const extractChatCompletionContent = core.extractChatCompletionContent as (payload: unknown) => string;

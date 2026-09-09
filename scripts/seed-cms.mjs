@@ -21,6 +21,12 @@ export const siteSettingFallbacks = [
   { key: "social.facebook", value: "https://www.facebook.com/share/1SfdmkP2Q2/", type: "url", group: "social" },
   { key: "social.tiktok", value: "", type: "url", group: "social" },
   { key: "social.youtube", value: "", type: "url", group: "social" },
+  { key: "seo.siteTitle", value: "Muxcor | Jewelry Catalogue & Product Inquiry", type: "text", group: "seo" },
+  { key: "seo.defaultDescription", value: "Explore Muxcor jewelry, bags and fashion accessories for wholesale, private-label and custom sourcing inquiries.", type: "textarea", group: "seo" },
+  { key: "seo.defaultKeywords", value: "Muxcor, wholesale jewelry, custom jewelry, fashion accessories, jewelry manufacturer", type: "textarea", group: "seo" },
+  { key: "seo.siteUrl", value: "", type: "url", group: "seo" },
+  { key: "seo.defaultOgImage", value: "/company/showroom-display.webp", type: "image", group: "seo" },
+  { key: "seo.twitterHandle", value: "", type: "text", group: "seo" },
 ];
 
 const sections = [

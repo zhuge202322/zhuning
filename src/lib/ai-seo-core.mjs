@@ -104,3 +104,9 @@ export function parseAiSeoResponse(text) {
     },
   };
 }
+
+export function extractChatCompletionContent(payload) {
+  const content = payload?.choices?.[0]?.message?.content;
+  if (typeof content !== "string" || !content.trim()) throw new Error("AI 响应缺少文本内容");
+  return content;
+}

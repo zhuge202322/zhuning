@@ -5,6 +5,7 @@ import {
   encryptApiKey,
   maskApiKey,
   parseAiSeoResponse,
+  extractChatCompletionContent,
   validateAiConfig,
 } from "../../src/lib/ai-seo-core.mjs";
 
@@ -14,6 +15,12 @@ test("encrypts an API key with authenticated encryption", () => {
   assert.equal(encrypted.includes("sk-test-value"), false);
   assert.equal(decryptApiKey(encrypted, "long-admin-secret"), "sk-test-value");
   assert.throws(() => decryptApiKey(encrypted, "wrong-secret"));
+});
+
+test("extracts only Chat Completions message content", () => {
+  assert.equal(extractChatCompletionContent({ choices: [{ message: { content: "{\"title\":\"x\"}" } }] }), '{"title":"x"}');
+  assert.throws(() => extractChatCompletionContent({ choices: [] }));
+  assert.throws(() => extractChatCompletionContent({ choices: [{ message: { content: 42 } }] }));
 });
 
 test("masks API keys without exposing the original value", () => {

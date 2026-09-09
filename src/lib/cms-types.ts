@@ -1,4 +1,4 @@
-export const SITE_SETTING_GROUPS = ["brand", "support", "company", "social"] as const;
+export const SITE_SETTING_GROUPS = ["brand", "support", "company", "social", "seo"] as const;
 
 export const SITE_SETTING_KEYS = [
   "site.name",
@@ -11,6 +11,12 @@ export const SITE_SETTING_KEYS = [
   "social.facebook",
   "social.tiktok",
   "social.youtube",
+  "seo.siteTitle",
+  "seo.defaultDescription",
+  "seo.defaultKeywords",
+  "seo.siteUrl",
+  "seo.defaultOgImage",
+  "seo.twitterHandle",
 ] as const;
 
 export const PAGE_KEYS = [

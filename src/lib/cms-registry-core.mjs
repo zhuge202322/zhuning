@@ -11,6 +11,12 @@ export const siteSettingRegistry = {
   "social.facebook": { label: "Facebook", type: "url", group: "social" },
   "social.tiktok": { label: "TikTok", type: "url", group: "social" },
   "social.youtube": { label: "YouTube", type: "url", group: "social" },
+  "seo.siteTitle": { label: "Default SEO title", type: "text", group: "seo" },
+  "seo.defaultDescription": { label: "Default SEO description", type: "textarea", group: "seo" },
+  "seo.defaultKeywords": { label: "Default SEO keywords", type: "textarea", group: "seo" },
+  "seo.siteUrl": { label: "Public site URL", type: "url", group: "seo" },
+  "seo.defaultOgImage": { label: "Default social sharing image", type: "image", group: "seo" },
+  "seo.twitterHandle": { label: "Twitter/X handle", type: "text", group: "seo" },
 };
 
 export const pageSectionRegistry = {
