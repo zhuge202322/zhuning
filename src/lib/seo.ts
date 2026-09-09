@@ -1,10 +1,11 @@
-import { PAGE_KEYS, type SeoTargetType } from "@/lib/cms-types";
+import type { SeoTargetType } from "@/lib/cms-types";
 import { prisma } from "@/lib/prisma";
 import type { SeoDraft, SeoRecord, SeoTarget } from "@/lib/seo-types";
 import { validateSeoInput } from "./seo-core.mjs";
 
 const PAGE_LABELS: Record<string, string> = {
   home: "Home",
+  products: "Products",
   about: "About Us",
   customization: "Customization",
   certifications: "Certifications",
@@ -61,7 +62,7 @@ export async function getSeoTarget(type: SeoTargetType, key: string): Promise<Se
     const row = await prisma.post.findUnique({ where: { slug: key } });
     return row ? { type, key: row.slug, label: row.title.replace(/<[^>]*>/g, " ").trim(), description: row.excerpt || row.content, category: "Insights", image: row.featuredImage || "" } : null;
   }
-  if (type === "PAGE" && PAGE_KEYS.includes(key as (typeof PAGE_KEYS)[number])) {
+  if (type === "PAGE" && Object.hasOwn(PAGE_LABELS, key)) {
     const hero = await prisma.pageSection.findUnique({ where: { pageKey_sectionKey: { pageKey: key, sectionKey: "hero" } } });
     return { type, key, label: PAGE_LABELS[key] || key, description: hero?.body || hero?.title || `${PAGE_LABELS[key] || key} at Muxcor.`, category: "Website page", image: hero?.mediaUrl || "" };
   }
@@ -83,6 +84,6 @@ export async function getSeoTargets(type: SeoTargetType, search = ""): Promise<S
     const rows = await prisma.post.findMany({ where: query ? { title: { contains: query } } : undefined, orderBy: { date: "desc" }, take: 100 });
     return rows.map((row) => ({ type, key: row.slug, label: row.title.replace(/<[^>]*>/g, " ").trim(), description: row.excerpt || row.content, category: "Insights", image: row.featuredImage || "" }));
   }
-  if (type === "PAGE") return PAGE_KEYS.map((key) => ({ type, key, label: PAGE_LABELS[key] || key, description: `${PAGE_LABELS[key] || key} at Muxcor.`, category: "Website page", image: "" }));
+  if (type === "PAGE") return Object.keys(PAGE_LABELS).map((key) => ({ type, key, label: PAGE_LABELS[key] || key, description: `${PAGE_LABELS[key] || key} at Muxcor.`, category: "Website page", image: "" }));
   return type === "SITE" ? [{ type, key: "site", label: "Muxcor", description: "Muxcor website", category: "Website", image: "" }] : [];
 }
