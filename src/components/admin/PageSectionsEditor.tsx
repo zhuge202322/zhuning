@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, CheckCircle2, RefreshCw, Save } from "lucide-react";
 import MediaUploader from "@/components/admin/MediaUploader";
+import SeoEditor from "@/components/admin/SeoEditor";
 
 type Section = {
   id: number; pageKey: string; sectionKey: string; eyebrow: string; title: string; body: string;
@@ -156,6 +157,7 @@ export function PageSectionsEditor() {
           </div>
         </article>
       ))}</div> : null}
+      {!loading ? <SeoEditor targetType="PAGE" targetKey={pageKey} label={`${PAGE_LABELS[pageKey] || pageKey} SEO`} defaultImage={sections.find((section) => section.sectionKey === "hero")?.mediaUrl || ""} /> : null}
     </div>
   );
 }

@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import RichEditor from './RichEditor';
 import MultiImageUploader, { ImageItem } from './MultiImageUploader';
-import ImageUploader from './ImageUploader';
 import TranslationTabs, { TranslationLocale } from './TranslationTabs';
 import { slugify } from '@/lib/slug';
 import { Save, ArrowLeft, Plus, Trash2, Layers, FileText, X } from 'lucide-react';
 import Link from 'next/link';
 import { LOCALE_LABEL } from './admin-labels';
+import SeoEditor from './SeoEditor';
 
 type Category = { id: number; name: string; depth: number; rootId: number; pathLabel: string };
 
@@ -72,13 +72,13 @@ export default function ProductForm({ mode, productId, initial, categories }: Pr
   const [images, setImages] = useState<ImageItem[]>(initial?.images || []);
   const [categoryIds, setCategoryIds] = useState<number[]>(initial?.categoryIds || []);
   const [skus, setSkus] = useState<SkuItem[]>(
-    initial?.skus?.map((s) => ({ ...s, tempId: s.id?.toString() || Math.random().toString() })) || []
+    initial?.skus?.map((s, index) => ({ ...s, tempId: s.id?.toString() || `existing-${index}` })) || []
   );
   const [nameI18n, setNameI18n] = useState<LocaleStrings>(initial?.translations?.name || EMPTY_LOCALE);
   const [shortDescI18n, setShortDescI18n] = useState<LocaleStrings>(initial?.translations?.shortDescription || EMPTY_LOCALE);
   const [descI18n, setDescI18n] = useState<LocaleStrings>(initial?.translations?.description || EMPTY_LOCALE);
-  const [specsI18n, setSpecsI18n] = useState<LocaleStrings>((initial?.translations as any)?.specs || EMPTY_LOCALE);
-  const [formulaI18n, setFormulaI18n] = useState<LocaleStrings>((initial?.translations as any)?.formula || EMPTY_LOCALE);
+  const [specsI18n, setSpecsI18n] = useState<LocaleStrings>(initial?.translations?.specs || EMPTY_LOCALE);
+  const [formulaI18n, setFormulaI18n] = useState<LocaleStrings>(initial?.translations?.formula || EMPTY_LOCALE);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -123,7 +123,7 @@ export default function ProductForm({ mode, productId, initial, categories }: Pr
     setSkus((prev) => prev.filter((s) => s.tempId !== tempId));
   }
 
-  function updateSku(tempId: string, key: keyof SkuItem, val: any) {
+  function updateSku<K extends keyof SkuItem>(tempId: string, key: K, val: SkuItem[K]) {
     setSkus((prev) =>
       prev.map((s) => (s.tempId === tempId ? { ...s, [key]: val } : s))
     );
@@ -157,7 +157,7 @@ export default function ProductForm({ mode, productId, initial, categories }: Pr
             nameEs: s.nameEs || '',
             nameAr: s.nameAr || '',
             image: s.images?.length ? s.images[0].src : (s.image || ''),
-            images: s.images?.map((img: any) => img.src) || [],
+            images: s.images?.map((img) => img.src) || [],
             price: s.price || '',
             size: s.size || '',
           })),
@@ -308,7 +308,7 @@ export default function ProductForm({ mode, productId, initial, categories }: Pr
           </div>
         ) : (
           <div className="space-y-6">
-            {skus.map((sku, index) => (
+            {skus.map((sku) => (
               <div
                 key={sku.tempId}
                 className="relative border border-slate-200 rounded-2xl p-6 bg-slate-50/50 hover:bg-slate-50 transition space-y-6"
@@ -474,6 +474,15 @@ export default function ProductForm({ mode, productId, initial, categories }: Pr
           </div>
         </div>
       </div>
+
+      {mode === 'edit' && initial?.slug ? (
+        <SeoEditor
+          targetType="PRODUCT"
+          targetKey={initial.slug}
+          label="产品 SEO"
+          defaultImage={images[0]?.src || ''}
+        />
+      ) : null}
 
       <TranslationTabs title="产品多语言翻译">
         {(locale, isRtl) => (

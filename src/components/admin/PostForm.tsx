@@ -9,6 +9,7 @@ import ImageUploader from './ImageUploader';
 import TranslationTabs, { TranslationLocale } from './TranslationTabs';
 import { slugify } from '@/lib/slug';
 import { LOCALE_LABEL } from './admin-labels';
+import SeoEditor from './SeoEditor';
 
 type LocaleStrings = Record<TranslationLocale, string>;
 const EMPTY_LOCALE: LocaleStrings = { fr: '', es: '', ar: '' };
@@ -146,6 +147,15 @@ export default function PostForm({ mode, postId, initial }: Props) {
         <h3 className="text-sm font-bold text-slate-700 mb-3">正文内容</h3>
         <RichEditor value={content} onChange={setContent} minHeight={500} />
       </div>
+
+      {mode === 'edit' && initial?.slug ? (
+        <SeoEditor
+          targetType="POST"
+          targetKey={initial.slug}
+          label="文章 SEO"
+          defaultImage={featuredImage || ''}
+        />
+      ) : null}
 
       <TranslationTabs title="文章多语言翻译">
         {(locale, isRtl) => (

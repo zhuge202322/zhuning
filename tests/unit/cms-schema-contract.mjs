@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { siteSettingFallbacks } from "../../scripts/seed-cms.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const prismaCli = path.join(repositoryRoot, "node_modules", "prisma", "build", "index.js");
@@ -199,7 +200,7 @@ test("CMS seed is idempotent and does not overwrite administrator edits", async 
 
   assert.deepEqual(secondCounts, firstCounts);
   assert.equal(firstCounts.admins, 1);
-  assert.equal(firstCounts.settings, 10);
+  assert.equal(firstCounts.settings, siteSettingFallbacks.length);
   assert.ok(firstCounts.sections > 0);
   assert.equal(
     (await prisma.siteSetting.findUnique({ where: { key: "support.email" } })).value,

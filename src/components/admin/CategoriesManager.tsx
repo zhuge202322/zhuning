@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { ChevronRight, Plus, Save, Trash2, X } from 'lucide-react';
 import ImageUploader from './ImageUploader';
 import { slugify } from '@/lib/slug';
+import SeoEditor from './SeoEditor';
 
 type Cat = {
   id: number;
@@ -176,6 +178,9 @@ function CategoryRow({ cat, categories }: { cat: Cat; categories: Cat[] }) {
           <button onClick={save} disabled={busy} className="inline-flex items-center gap-2 rounded-lg bg-brand-primary px-4 py-2 text-sm font-bold text-white disabled:opacity-50"><Save className="h-4 w-4" />{busy ? '保存中...' : '保存'}</button>
           <button onClick={() => setEditing(false)} className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-100"><X className="h-4 w-4" />取消</button>
         </div>
+        <div className="md:col-span-2">
+          <SeoEditor targetType="CATEGORY" targetKey={cat.slug} label="分类 SEO" defaultImage={imageUrl || ''} />
+        </div>
       </div>
     );
   }
@@ -183,7 +188,7 @@ function CategoryRow({ cat, categories }: { cat: Cat; categories: Cat[] }) {
   return (
     <div className="flex items-center gap-4 px-6 py-4" style={{ paddingLeft: `${24 + cat.depth * 28}px` }}>
       {cat.depth > 0 && <ChevronRight className="h-4 w-4 shrink-0 text-slate-300" />}
-      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100">{cat.imageUrl && <img src={cat.imageUrl} alt="" className="h-full w-full object-cover" />}</div>
+      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100">{cat.imageUrl && <Image src={cat.imageUrl} alt="" fill sizes="56px" className="object-cover" />}</div>
       <div className="min-w-0 flex-1">
         <div className="font-bold text-slate-800">{cat.name}</div>
         <div className="truncate text-xs text-slate-500">{cat.pathLabel}</div>
