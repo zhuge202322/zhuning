@@ -15,6 +15,7 @@ import {
   ShoppingCart,
   PanelsTopLeft,
   Settings,
+  WandSparkles,
 } from 'lucide-react';
 
 const NAV = [
@@ -26,6 +27,7 @@ const NAV = [
   { href: '/admin/categories', label: '产品类目', icon: FolderOpen },
   { href: '/admin/pages', label: '页面板块', icon: PanelsTopLeft },
   { href: '/admin/settings', label: '网站设置', icon: Settings },
+  { href: '/admin/ai-seo', label: 'AI SEO 优化', icon: WandSparkles },
   { href: '/admin/posts', label: '文章管理', icon: FileText },
   { href: '/admin/media', label: '网站媒体', icon: Image },
   { href: '/admin/media-library', label: '媒体库', icon: Image },

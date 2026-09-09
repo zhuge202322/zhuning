@@ -11,6 +11,7 @@ const GROUP_LABELS: Record<string, string> = {
   support: "客服联系方式",
   company: "公司信息",
   social: "社交媒体",
+  seo: "全局 SEO",
 };
 
 const SETTING_LABELS: Record<string, string> = {
@@ -24,6 +25,12 @@ const SETTING_LABELS: Record<string, string> = {
   "social.facebook": "Facebook",
   "social.tiktok": "TikTok",
   "social.youtube": "YouTube",
+  "seo.siteTitle": "默认 SEO 标题",
+  "seo.defaultDescription": "默认 SEO 描述",
+  "seo.defaultKeywords": "默认关键词（逗号分隔）",
+  "seo.siteUrl": "网站正式地址",
+  "seo.defaultOgImage": "默认社交分享图片",
+  "seo.twitterHandle": "Twitter/X 账号",
 };
 
 export function SettingsEditor() {
