@@ -44,3 +44,8 @@ test("builds bounded English SEO fallbacks from source data", () => {
   assert.deepEqual(draft.keywords.slice(0, 2), ["ruby statement ring", "rings"]);
   assert.equal(draft.ogImage, "/products/ruby-ring.webp");
 });
+
+test("does not append the Muxcor brand twice in fallback titles", () => {
+  assert.equal(buildSeoFallback({ name: "Products | Muxcor" }).title, "Products | Muxcor");
+  assert.equal(buildSeoFallback({ name: "Muxcor Luxury Jewelry" }).title, "Muxcor Luxury Jewelry");
+});

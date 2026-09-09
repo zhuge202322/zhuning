@@ -42,8 +42,9 @@ export function buildSeoFallback({ name, category = "", description = "", image 
   const cleanCategory = plainText(category);
   const sourceDescription = plainText(description) || `Explore ${cleanName}${cleanCategory ? ` in our ${cleanCategory} collection` : ""} from Muxcor.`;
   const keywords = [...new Set([cleanName.toLowerCase(), cleanCategory.toLowerCase(), "muxcor", "wholesale jewelry"].filter(Boolean))];
+  const brandedTitle = /\bmuxcor\b/i.test(cleanName) ? cleanName : `${cleanName} | Muxcor`;
   return {
-    title: truncate(`${cleanName} | Muxcor`, 70),
+    title: truncate(brandedTitle, 70),
     description: truncate(sourceDescription, 170),
     keywords,
     canonicalUrl: "",
