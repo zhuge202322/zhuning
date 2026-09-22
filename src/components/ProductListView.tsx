@@ -23,6 +23,7 @@ export function ProductListView({
   initialMinPrice = "",
   initialSortMode = "Featured",
   initialPage = "1",
+  allProductsLabel = "All products",
   products,
   categories,
 }: {
@@ -31,6 +32,7 @@ export function ProductListView({
   initialMinPrice?: string;
   initialSortMode?: SortMode;
   initialPage?: string;
+  allProductsLabel?: string;
   products: StoreProduct[];
   categories: StoreCategoryNode[];
 }) {
@@ -76,6 +78,43 @@ export function ProductListView({
     return query ? `/products?${query}` : "/products";
   }
 
+  function renderCategoryNode(item: StoreCategoryNode): React.ReactNode {
+    const isSelected = selectedCategory?.id === item.id;
+    const selectedDescendant = selectedCategory ? item.descendantIds.includes(selectedCategory.id) : false;
+    const hasChildren = item.children.length > 0;
+    const categoryLink = (
+      <Link
+        className={`category-tree-link ${isSelected ? "active" : ""}`}
+        aria-current={isSelected ? "page" : undefined}
+        href={categoryHref(item.slug)}
+      >
+        <span className="category-link-name">
+          {!hasChildren ? <span className="category-depth-marker" aria-hidden="true" /> : null}
+          {item.name}
+        </span>
+        <strong>{item.productCount}</strong>
+      </Link>
+    );
+
+    if (!hasChildren) {
+      return (
+        <div className="category-tree-node category-tree-leaf" key={item.id} style={{ "--category-depth": item.depth } as CSSProperties}>
+          {categoryLink}
+        </div>
+      );
+    }
+
+    return (
+      <div className="category-tree-node category-tree-branch" key={item.id} style={{ "--category-depth": item.depth } as CSSProperties}>
+        <details className="category-tree-disclosure" open={selectedDescendant}>
+          <summary aria-label={`Toggle ${item.name} subcategories`} />
+          <div className="category-tree-children">{item.children.map(renderCategoryNode)}</div>
+        </details>
+        {categoryLink}
+      </div>
+    );
+  }
+
   return (
     <>
       <PageMotion />
@@ -92,19 +131,10 @@ export function ProductListView({
             <h2>Categories</h2>
             <div className="sidebar-category-list" role="list" aria-label="Product category filter">
               <Link className={!selectedCategory ? "active" : ""} aria-current={!selectedCategory ? "page" : undefined} href={categoryHref("")}>
-                <span>All jewelry</span><strong>{products.length}</strong>
+                <span className="category-link-name"><span className="category-depth-marker" aria-hidden="true" />{allProductsLabel}</span>
+                <strong>{products.length}</strong>
               </Link>
-              {flatCategories.map((item) => (
-                <Link
-                  key={item.id}
-                  className={selectedCategory?.id === item.id ? "active" : ""}
-                  aria-current={selectedCategory?.id === item.id ? "page" : undefined}
-                  href={categoryHref(item.slug)}
-                  style={{ "--category-depth": item.depth } as CSSProperties}
-                >
-                  <span className="category-link-name"><span className="category-depth-marker" aria-hidden="true" />{item.name}</span><strong>{item.productCount}</strong>
-                </Link>
-              ))}
+              {categories.map(renderCategoryNode)}
             </div>
           </div>
 

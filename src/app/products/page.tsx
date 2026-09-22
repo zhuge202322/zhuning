@@ -3,6 +3,7 @@ import { ProductListView } from "@/components/ProductListView";
 import { getStoreCategoryTree, getStoreProducts } from "@/lib/storefront-data";
 import { buildPublicMetadata, getPublicSeoSettings } from "@/lib/public-seo";
 import { robotsForProductList } from "@/lib/public-seo-core.mjs";
+import { getSiteSetting } from "@/lib/cms";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +52,11 @@ function normalizePrice(value?: string) {
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const { category, max, min, sort, page } = await searchParams;
-  const [products, categories] = await Promise.all([getStoreProducts(), getStoreCategoryTree()]);
+  const [products, categories, allProductsSetting] = await Promise.all([
+    getStoreProducts(),
+    getStoreCategoryTree(),
+    getSiteSetting("storefront.allProductsLabel"),
+  ]);
   return (
     <ProductListView
       initialCategorySlug={category || ""}
@@ -61,6 +66,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       initialPage={page || "1"}
       products={products}
       categories={categories}
+      allProductsLabel={allProductsSetting?.value || "All products"}
     />
   );
 }

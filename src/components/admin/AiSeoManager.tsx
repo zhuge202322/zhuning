@@ -105,6 +105,17 @@ export function AiSeoManager() {
       {error && <div role="alert" className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
       {message && <div className="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"><CheckCircle2 className="h-4 w-4" />{message}</div>}
 
+      <section className="rounded-lg border border-sky-200 bg-sky-50 p-5 text-sm text-sky-950">
+        <h3 className="font-bold">使用说明</h3>
+        <ol className="mt-2 list-decimal space-y-1 pl-5">
+          <li>先在“AI 服务配置”中填写中转 API 地址、模型和 API Key，并保存配置。</li>
+          <li>选择内容类型，搜索并勾选需要优化的产品、类目或页面，最多 20 项。</li>
+          <li>点击“生成 SEO 草稿”，检查标题、描述、关键词、Canonical 和 Robots 设置。</li>
+          <li>确认内容准确后，点击每条结果的“保存 SEO”；AI 内容不会自动发布。</li>
+        </ol>
+        <p className="mt-3 text-xs text-sky-800">API Key 只会加密保存于 SQLite，页面不会显示完整密钥。生成失败时请先检查 API 地址、模型名称、Key 状态和服务器网络。</p>
+      </section>
+
       <section className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="mb-4 flex items-center gap-2"><KeyRound className="h-5 w-5 text-brand-primary" /><h3 className="font-bold text-slate-900">AI 服务配置</h3></div>
         {!config ? <div className="flex items-center gap-2 text-sm text-slate-500"><LoaderCircle className="h-4 w-4 animate-spin" />加载配置...</div> : <div className="grid gap-4 md:grid-cols-2">

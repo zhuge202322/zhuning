@@ -4,6 +4,7 @@ import { ArrowUpRight, BadgeCheck, FileCheck2, FlaskConical, Globe2, ShieldCheck
 import { PageMotion } from "@/components/PageMotion";
 import { certificates } from "@/data/company";
 import { buildPublicMetadata } from "@/lib/public-seo";
+import { getPageSection } from "@/lib/cms";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPublicMetadata({ type: "PAGE", key: "certifications", pathname: "/certifications", fallbackTitle: "Certifications & Test Reports | Muxcor", fallbackDescription: "Review Muxcor company certifications, supplier assessments, representative REACH reports, GPSR support, and German packaging documentation.", fallbackImage: "/company/detail-panels/13-certificate-collection-hd.webp" });
@@ -16,7 +17,14 @@ const complianceAreas = [
   { icon: Globe2, title: "Market support", copy: "EU representative and German packaging registration documentation." },
 ];
 
-export default function CertificationsPage() {
+export default async function CertificationsPage() {
+  const [heroSection, evidenceSection] = await Promise.all([
+    getPageSection("certifications", "hero"),
+    getPageSection("certifications", "evidence"),
+  ]);
+  const heroImage = heroSection?.mediaUrl || "/company/detail-panels/13-certificate-collection-hd.webp";
+  const evidenceImage = evidenceSection?.mediaUrl || "/company/detail-panels/09-company-profile-hd.webp";
+
   return (
     <>
       <PageMotion />
@@ -30,7 +38,7 @@ export default function CertificationsPage() {
           </p>
         </div>
         <div className="cert-hero-document" aria-hidden="true">
-          <Image src="/company/detail-panels/13-certificate-collection-hd.webp" alt="" fill priority unoptimized sizes="420px" />
+          <Image src={heroImage} alt="" fill priority unoptimized sizes="420px" />
         </div>
       </section>
 
@@ -55,7 +63,7 @@ export default function CertificationsPage() {
           </div>
         </div>
         <div className="cert-evidence-grid">
-          <Image src="/company/detail-panels/09-company-profile-hd.webp" alt="Muxcor company profile" width={1076} height={810} unoptimized sizes="(max-width: 860px) 100vw, 33vw" />
+          <Image src={evidenceImage} alt="Muxcor company profile" width={1076} height={810} unoptimized sizes="(max-width: 860px) 100vw, 33vw" />
           <Image src="/company/detail-panels/11-factory-overview-hd.webp" alt="Muxcor factory production overview" width={1070} height={950} unoptimized sizes="(max-width: 860px) 100vw, 33vw" />
           <Image src="/company/detail-panels/12-process-flow-hd.webp" alt="Jewelry production process flow" width={1076} height={886} unoptimized sizes="(max-width: 860px) 100vw, 33vw" />
         </div>

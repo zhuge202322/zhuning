@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 export const siteSettingFallbacks = [
   { key: "site.name", value: "Muxcor", type: "text", group: "brand" },
   { key: "site.logo", value: "/company/muxcor-logo.png", type: "image", group: "brand" },
+  { key: "storefront.allProductsLabel", value: "All products", type: "text", group: "storefront" },
   { key: "support.email", value: "Crescent@muxcor.com", type: "email", group: "support" },
   { key: "support.phone", value: "", type: "text", group: "support" },
   { key: "support.whatsapp", value: "+86 134 1613 4933", type: "text", group: "support" },

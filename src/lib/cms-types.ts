@@ -1,8 +1,9 @@
-export const SITE_SETTING_GROUPS = ["brand", "support", "company", "social", "seo"] as const;
+export const SITE_SETTING_GROUPS = ["brand", "storefront", "support", "company", "social", "seo"] as const;
 
 export const SITE_SETTING_KEYS = [
   "site.name",
   "site.logo",
+  "storefront.allProductsLabel",
   "support.email",
   "support.phone",
   "support.whatsapp",

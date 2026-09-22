@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle2, FilePenLine, Gem, PackageCheck, Palette, Scan
 import { PageMotion } from "@/components/PageMotion";
 import { customizationSteps } from "@/data/company";
 import { buildPublicMetadata } from "@/lib/public-seo";
+import { getPageSection } from "@/lib/cms";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPublicMetadata({ type: "PAGE", key: "customization", pathname: "/customization", fallbackTitle: "Custom Jewelry Process | Muxcor OEM & ODM", fallbackDescription: "Explore Muxcor's custom jewelry workflow from requirement review and CAD development to sampling, production, polishing, packing, and delivery.", fallbackImage: "/company/customization-process.webp" });
@@ -17,7 +18,18 @@ const projectInputs = [
   { icon: ScanSearch, title: "Sample approval", copy: "Review the physical sample and confirm details before production begins." },
 ];
 
-export default function CustomizationPage() {
+export default async function CustomizationPage() {
+  const [heroSection, referenceSection, processMediaSection, assuranceSection] = await Promise.all([
+    getPageSection("customization", "hero"),
+    getPageSection("customization", "reference"),
+    getPageSection("customization", "process-media"),
+    getPageSection("customization", "assurance"),
+  ]);
+  const heroImage = heroSection?.mediaUrl || "/company/customization-process.webp";
+  const referenceImage = referenceSection?.mediaUrl || "/company/detail-panels/01-oem-odm-overview-hd.webp";
+  const assuranceImage = assuranceSection?.mediaUrl || "/company/custom-made.webp";
+  const processPoster = processMediaSection?.mediaUrl || "/company/custom-made.webp";
+
   return (
     <>
       <PageMotion />
@@ -34,7 +46,7 @@ export default function CustomizationPage() {
           </a>
         </div>
         <div className="custom-hero-media">
-          <Image src="/company/customization-process.webp" alt="Muxcor customization process from design to finished jewelry" fill priority sizes="(max-width: 860px) 100vw, 52vw" />
+          <Image src={heroImage} alt="Muxcor customization process from design to finished jewelry" fill priority sizes="(max-width: 860px) 100vw, 52vw" />
         </div>
       </section>
 
@@ -88,7 +100,7 @@ export default function CustomizationPage() {
         </div>
         <div className="customization-panel-grid">
           <Image
-            src="/company/detail-panels/01-oem-odm-overview-hd.webp"
+            src={referenceImage}
             alt="Muxcor OEM and ODM jewelry overview"
             width={1078}
             height={1506}
@@ -115,7 +127,7 @@ export default function CustomizationPage() {
         </div>
         <div className="craft-video-grid">
           <figure>
-            <video controls playsInline preload="metadata" poster="/company/custom-made.webp">
+            <video controls playsInline preload="metadata" poster={processPoster}>
               <source src="/company/craft-process-1.mp4" type="video/mp4" />
             </video>
             <figcaption>
@@ -137,7 +149,7 @@ export default function CustomizationPage() {
 
       <section className="custom-assurance page-reveal">
         <div className="custom-assurance-image">
-          <Image src="/company/custom-made.webp" alt="Custom jewelry development from sketch and CAD to crafting and polish" fill sizes="(max-width: 860px) 100vw, 48vw" />
+          <Image src={assuranceImage} alt="Custom jewelry development from sketch and CAD to crafting and polish" fill sizes="(max-width: 860px) 100vw, 48vw" />
         </div>
         <div>
           <p className="section-kicker">Before production</p>

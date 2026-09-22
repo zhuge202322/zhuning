@@ -27,8 +27,7 @@ import { formatProductPrice } from "@/lib/currency";
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: "/products", label: "Jewelry" },
-  { href: "/collections/womens-bags", label: "Women's Bags" },
+  { href: "/products", label: "Products" },
   { href: "/account", label: "Account" },
   { href: "/about", label: "About Us" },
   { href: "/customization", label: "Customization" },
@@ -61,7 +60,7 @@ const productMegaMenu = [
   },
 ];
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ children, allProductsLabel }: { children: React.ReactNode; allProductsLabel: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const {
     addToCart,
@@ -116,7 +115,7 @@ function Shell({ children }: { children: React.ReactNode }) {
                       <span>Crimson Drop Luxury</span>
                       <strong>Shop by category</strong>
                       <Link href="/products">
-                        All jewelry
+                        {allProductsLabel}
                         <ChevronRight size={16} />
                       </Link>
                     </div>
@@ -341,10 +340,10 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SiteChrome({ children }: { children: React.ReactNode }) {
+export function SiteChrome({ children, allProductsLabel = "All products" }: { children: React.ReactNode; allProductsLabel?: string }) {
   return (
     <CartProvider>
-      <Shell>{children}</Shell>
+      <Shell allProductsLabel={allProductsLabel}>{children}</Shell>
     </CartProvider>
   );
 }

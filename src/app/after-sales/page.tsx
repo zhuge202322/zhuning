@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PolicyPage } from "@/components/PolicyPage";
 import { buildPublicMetadata } from "@/lib/public-seo";
+import { getPageSection } from "@/lib/cms";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPublicMetadata({ type: "PAGE", key: "after-sales", pathname: "/after-sales", fallbackTitle: "After-sales Service | Muxcor", fallbackDescription: "Muxcor after-sales support for product inquiries, production issues, and shipment documentation." });
@@ -26,7 +27,10 @@ const sections = [
   },
 ];
 
-export default function AfterSalesPage() {
+export default async function AfterSalesPage() {
+  const evidenceSection = await getPageSection("after-sales", "evidence");
+  const primaryEvidenceImage = evidenceSection?.mediaUrl || "/company/detail-panels/08-customer-reviews-hd.webp";
+
   return (
     <>
       <PolicyPage
@@ -45,7 +49,7 @@ export default function AfterSalesPage() {
         <div className="after-sales-media-grid">
           <figure>
             <Image
-              src="/company/detail-panels/08-customer-reviews-hd.webp"
+              src={primaryEvidenceImage}
               alt="Customer review highlights for Muxcor jewelry orders"
               width={1074}
               height={1308}

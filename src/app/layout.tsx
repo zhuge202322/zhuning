@@ -5,6 +5,7 @@ import { SiteChrome } from "@/components/SiteChrome";
 import "./globals.css";
 import "./storefront.css";
 import { buildRootMetadata } from "@/lib/public-seo";
+import { getSiteSetting } from "@/lib/cms";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -31,10 +32,12 @@ export default async function RootLayout({
 
   if (isAdmin) return children;
 
+  const allProductsLabel = (await getSiteSetting("storefront.allProductsLabel"))?.value || "All products";
+
   return (
     <html lang="en">
       <body className={`${cormorant.variable} ${montserrat.variable}`}>
-        <SiteChrome>{children}</SiteChrome>
+        <SiteChrome allProductsLabel={allProductsLabel}>{children}</SiteChrome>
       </body>
     </html>
   );

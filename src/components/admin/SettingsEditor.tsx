@@ -8,6 +8,7 @@ type Setting = { key: string; value: string; label: string; type: string; group:
 
 const GROUP_LABELS: Record<string, string> = {
   brand: "品牌信息",
+  storefront: "前台商城",
   support: "客服联系方式",
   company: "公司信息",
   social: "社交媒体",
@@ -17,6 +18,7 @@ const GROUP_LABELS: Record<string, string> = {
 const SETTING_LABELS: Record<string, string> = {
   "site.name": "网站名称",
   "site.logo": "公司 Logo",
+  "storefront.allProductsLabel": "全部产品名称",
   "support.email": "客服邮箱",
   "support.phone": "客服电话",
   "support.whatsapp": "WhatsApp",

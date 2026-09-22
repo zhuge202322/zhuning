@@ -5,6 +5,7 @@ import { ArrowRight, Camera, Factory, Gem, Mail, MapPin, MessageCircle, PackageC
 import { PageMotion } from "@/components/PageMotion";
 import { companyProfile, companyStats, companyTimeline } from "@/data/company";
 import { buildPublicMetadata } from "@/lib/public-seo";
+import { getPageSection } from "@/lib/cms";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPublicMetadata({ type: "PAGE", key: "about", pathname: "/about", fallbackTitle: "About Muxcor | Jewelry Manufacturer in Guangzhou", fallbackDescription: "Meet Guangzhou Muxcor International Co., Ltd., explore the workshop and showroom, and learn about its jewelry production and customization capabilities.", fallbackImage: "/company/showroom-interior.webp" });
@@ -48,12 +49,28 @@ const capabilities = [
   },
 ];
 
-export default function AboutPage() {
+function withPrimaryMedia<T extends { src: string }>(items: T[], mediaUrl?: string) {
+  const nextUrl = mediaUrl?.trim();
+  return nextUrl ? items.map((item, index) => index === 0 ? { ...item, src: nextUrl } : item) : items;
+}
+
+export default async function AboutPage() {
+  const [heroSection, storySection, presentationSection, gallerySection] = await Promise.all([
+    getPageSection("about", "hero"),
+    getPageSection("about", "story"),
+    getPageSection("about", "presentation"),
+    getPageSection("about", "gallery"),
+  ]);
+  const heroImage = heroSection?.mediaUrl || "/company/jewelry-studio.webp";
+  const storyImage = storySection?.mediaUrl || "/company/production-machines.webp";
+  const companyPanels = withPrimaryMedia(suppliedCompanyPanels, presentationSection?.mediaUrl);
+  const companyGallery = withPrimaryMedia(gallery, gallerySection?.mediaUrl);
+
   return (
     <>
       <PageMotion />
       <section className="company-hero company-hero-rich page-reveal">
-        <Image src="/company/jewelry-studio.webp" alt="Muxcor jewelry studio in Guangzhou" fill priority sizes="100vw" />
+        <Image src={heroImage} alt="Muxcor jewelry studio in Guangzhou" fill priority sizes="100vw" />
         <div className="company-hero-scrim" />
         <div>
           <p className="section-kicker">Our company</p>
@@ -93,7 +110,7 @@ export default function AboutPage() {
           <Link className="secondary-link" href="/products">Browse the current catalogue</Link>
         </div>
         <div className="company-story-image">
-          <Image src="/company/production-machines.webp" alt="Muxcor jewelry production area" fill sizes="(max-width: 860px) 100vw, 48vw" />
+          <Image src={storyImage} alt="Muxcor jewelry production area" fill sizes="(max-width: 860px) 100vw, 48vw" />
         </div>
       </section>
 
@@ -146,7 +163,7 @@ export default function AboutPage() {
           </div>
         </div>
         <div className="company-editorial-grid">
-          {suppliedCompanyPanels.map((panel) => (
+          {companyPanels.map((panel) => (
             <Image
               src={panel.src}
               alt={panel.alt}
@@ -168,7 +185,7 @@ export default function AboutPage() {
           </div>
         </div>
         <div className="company-photo-grid">
-          {gallery.map((image, index) => (
+          {companyGallery.map((image, index) => (
             <figure className={index === 0 || index === 5 ? "wide" : ""} key={image.src}>
               <Image src={image.src} alt={image.alt} fill sizes="(max-width: 560px) 100vw, (max-width: 1000px) 50vw, 33vw" />
             </figure>

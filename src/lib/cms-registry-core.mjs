@@ -3,6 +3,7 @@ import { pageSectionFallbacks } from "../../scripts/seed-cms.mjs";
 export const siteSettingRegistry = {
   "site.name": { label: "Website name", type: "text", group: "brand" },
   "site.logo": { label: "Company logo", type: "image", group: "brand" },
+  "storefront.allProductsLabel": { label: "All products label", type: "text", group: "storefront" },
   "support.email": { label: "Customer service email", type: "email", group: "support" },
   "support.phone": { label: "Customer service phone", type: "text", group: "support" },
   "support.whatsapp": { label: "WhatsApp", type: "text", group: "support" },

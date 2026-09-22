@@ -13,7 +13,16 @@ import type { StoreProduct } from "@/lib/storefront-data";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const heroSlides = [
+export type HeroSlide = {
+  image: string;
+  alt: string;
+  kicker: string;
+  title: string;
+  copy: string;
+  imageMode: "cover" | "poster";
+};
+
+const defaultHeroSlides: HeroSlide[] = [
   {
     image: "/products/ruby-oval-pendant-necklace.png",
     alt: "Ruby oval pendant necklace on a crimson luxury background",
@@ -40,13 +49,22 @@ const heroSlides = [
   },
 ];
 
-export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
+export function LuxuryStorefront({
+  products,
+  heroSlides,
+  sectionMedia,
+}: {
+  products: StoreProduct[];
+  heroSlides?: HeroSlide[];
+  sectionMedia?: { company?: string; customization?: string };
+}) {
   const [activeProduct, setActiveProduct] = useState<StoreProduct | null>(products[0] ?? null);
   const [activeSlide, setActiveSlide] = useState(0);
   const [selectedAdded, setSelectedAdded] = useState(false);
   const didMountSlide = useRef(false);
   const { addToCart } = useCart();
-  const slide = heroSlides[activeSlide];
+  const slides = heroSlides?.length ? heroSlides : defaultHeroSlides;
+  const slide = slides[activeSlide % slides.length];
   const visibleProducts = products.slice(0, 8);
 
   useLayoutEffect(() => {
@@ -139,11 +157,11 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
     if (reduceMotion) return;
 
     const timer = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % heroSlides.length);
+      setActiveSlide((current) => (current + 1) % slides.length);
     }, 5600);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
   useEffect(() => {
     if (!selectedAdded) return;
@@ -158,7 +176,7 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
   }
 
   function goToSlide(index: number) {
-    setActiveSlide((index + heroSlides.length) % heroSlides.length);
+    setActiveSlide((index + slides.length) % slides.length);
   }
 
   return (
@@ -195,7 +213,7 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
             <ChevronLeft size={20} />
           </button>
           <div className="hero-dots" role="tablist" aria-label="Hero images">
-            {heroSlides.map((item, index) => (
+            {slides.map((item, index) => (
               <button
                 type="button"
                 key={item.image}
@@ -309,7 +327,7 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
       <section id="craft" className="home-company-story reveal">
         <div className="home-company-gallery" aria-label="Muxcor workplace">
           <figure className="home-company-primary">
-            <Image src="/company/showroom-display.webp" alt="Muxcor jewelry showroom display" fill sizes="(max-width: 860px) 100vw, 48vw" />
+            <Image src={sectionMedia?.company || "/company/showroom-display.webp"} alt="Muxcor jewelry showroom display" fill sizes="(max-width: 860px) 100vw, 48vw" />
           </figure>
           <figure>
             <Image src="/company/production-machines.webp" alt="Muxcor production equipment" fill sizes="(max-width: 860px) 50vw, 24vw" />
@@ -339,7 +357,7 @@ export function LuxuryStorefront({ products }: { products: StoreProduct[] }) {
 
       <section className="home-customization reveal">
         <div className="home-process-video">
-          <video controls playsInline preload="metadata" poster="/company/custom-made.webp">
+          <video controls playsInline preload="metadata" poster={sectionMedia?.customization || "/company/custom-made.webp"}>
             <source src="/company/craft-process-1.mp4" type="video/mp4" />
           </video>
         </div>
